@@ -219,7 +219,7 @@ void Analyzer::createTaggedTrackCollection(std::vector<MaterialBudget*> material
     // TODO: add the beam pipe as a user material eveywhere!
     // in a coherent way
     // Add the hit on the beam pipe
-    double rPos  = 23.*Units::mm;
+    double rPos  = 14.*Units::mm;
     double zPos  = rPos/tan(theta);
 
     HitPtr hit(new Hit(rPos, zPos, nullptr, HitPassiveType::BeamPipe));
@@ -525,7 +525,7 @@ bool Analyzer::analyzePatterReco(MaterialBudget& mb, mainConfigHandler& mainConf
     findAllHits(mb, pm, matTrack);
 
     // Add beam-pipe
-    double rPos  = 23.*Units::mm;
+    double rPos  = 14.*Units::mm;
     double zPos  = rPos/tan(theta);
 
     HitPtr hit(new Hit(rPos, zPos, nullptr, HitPassiveType::BeamPipe));
@@ -1103,7 +1103,7 @@ void Analyzer::analyzeMaterialBudget(MaterialBudget& mb, const std::vector<doubl
     // TODO: add the beam pipe as a user material eveywhere!
     // in a coherent way
     // Add the hit on the beam pipe
-    double rPos  = 23.*Units::mm;
+    double rPos  = 14.*Units::mm;
     double zPos  = rPos/tan(theta);
 
     HitPtr hit(new Hit(rPos, zPos, nullptr, HitPassiveType::BeamPipe));
@@ -3126,6 +3126,14 @@ void Analyzer::analyzeGeometry(Tracker& tracker, int nTracks /*=1000*/ ) {
   double randomSpan = (etaMinMax.second - etaMinMax.first)*(1. + randomPercentMargin);
   double randomBase = etaMinMax.first - (etaMinMax.second - etaMinMax.first)*(randomPercentMargin)/2.;
   double maxEta = etaMinMax.second *= (1 + randomPercentMargin);
+  //just for debug ----by ZengHao
+  std::cout << endl;
+  std::cout << "etaMin=" << etaMinMax.first << endl;
+  std::cout << "etaMax=" << etaMinMax.second << endl;
+  std::cout << "randomSpan=" << randomSpan << endl;
+  std::cout << "randomBase=" << randomBase << endl;
+  std::cout << "maxEta=" << maxEta << endl;
+  //end of debug
 
 
   // Initialize random number generator, counters and histograms
@@ -3305,6 +3313,17 @@ void Analyzer::analyzeGeometry(Tracker& tracker, int nTracks /*=1000*/ ) {
       computeCoveragePlotsAllLayers(aLine, numLayersWithAtLeastOneHit, numStubsPerTrack, plotMaxNumberOfStubs);     
     }
   }
+  //following code just for debug -----by ZengHao
+  TFile map2D("/cefs/higgs/zengh/cepcLayout/CEPC_V4/outputfile/map2D.root","update");
+  std::cout << "Save the mapPhiEta(no average)..." ;
+  mapPhiEta.Write();
+  std::cout << "done" << endl;
+  std::cout << "Save the mapPhiEtaCount..." ;
+  mapPhiEtaCount.Write();
+  std::cout << "done" << endl;
+  map2D.Close();
+  //end of debug
+
 
   // Create and archive for saving our 2D map of hits
   double hitCount;
@@ -3318,6 +3337,14 @@ void Analyzer::analyzeGeometry(Tracker& tracker, int nTracks /*=1000*/ ) {
       }
     }
   }
+  //for debug ----by ZengHao
+  std::cout << "Save the mapPhiEta(average)...";
+  TFile map2DAverage("/cefs/higgs/zengh/cepcLayout/CEPC_V4/outputfile/map2DAverage.root","update");
+  mapPhiEta.Write();
+  std::cout << "done" << endl;
+  map2DAverage.Close();
+  //end of debug
+
 
   // Create and archive for saving our 2D map of hits
   double DTCCount;

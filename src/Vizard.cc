@@ -2883,16 +2883,16 @@ namespace insur {
     if (isPixelTracker) {
       logINFO("PIXEL HACK for beam pipe");
       TPolyLine* beampipe  = new TPolyLine();
-      beampipe->SetPoint(0, 0, 45/2.);
-      beampipe->SetPoint(1, 2915/2., 45/2.);
+      beampipe->SetPoint(0, 0, 28/2.);
+      beampipe->SetPoint(1, 2915/2., 28/2.);
       beampipe->SetPoint(2, 3804/2., 56.6/2.);
       beampipe->SetPoint(3, 3804/2.+1164, 91/2.);
       for (auto& XYCanvasEC : XYCanvasesEC) {
 	XYCanvasEC->cd();
-	drawCircle(22.5, true, 18); // "grey18"
+	drawCircle(14.0, true, 18); // "grey18"
       }
       XYCanvas->cd();
-      drawCircle(22.5, true, 18); // "grey18"
+      drawCircle(14.0, true, 18); // "grey18"
       RZCanvas->cd();
       beampipe->Draw("same");
       RZCanvasBarrel->cd();
@@ -3235,7 +3235,24 @@ namespace insur {
 	efficiencyHistogram->SetYTitle("Eta bins");
 	efficiencyHistogram->SetFillColor(Palette::color(1));
 	efficiencyHistogram->Draw();
-	for (int i=1; i<=overallCoverage.GetNbinsX(); ++i) efficiencyHistogram->Fill(1-overallCoverage.GetBinContent(i));
+	for (int i=1; i<=overallCoverage.GetNbinsX(); ++i) 
+        {
+            efficiencyHistogram->Fill(1-overallCoverage.GetBinContent(i));
+            //just for debug -----by ZengHao
+            //std::cout << "##########this is debug information###########" << endl;
+            //std::cout << "i:" << i << endl;
+            //std::cout << "bin content of i:" << overallCoverage.GetBinContent(i) << endl;
+            //
+        }
+    //also for debug ----by ZengHao
+    std::cout << "Inefficiency histogram entries:" << efficiencyHistogram->GetEntries() << endl;
+    std::cout << "Entries of the first bin of inefficiency histogram:" << efficiencyHistogram->GetBinContent(1) << endl;
+    TFile eff("/cefs/higgs/zengh/cepcLayout/CEPC_V4/outputfile/effi_histo.root","update");
+    efficiencyHistogram->Write();
+    eff.Close();
+    //end of debug
+
+
 	TPaveText* tpt;
 	tpt = new TPaveText(0.65, 0.65, 0.95, 0.95, "NB NDC");
 	tpt->SetBorderSize(1);
