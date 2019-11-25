@@ -95,22 +95,30 @@ public:
   FixedSizeMultiProperty<std::vector<double>, 4,','> phiForbiddenRanges;
   Property<bool, Default> rotateLayerByRodsDeltaPhiHalf;
 
+  // TILTED MODE
   Property<int, NoDefault> buildNumModulesFlat;
   Property<int, NoDefault> buildNumModulesTilted;
   Property<bool, Default> isTilted;
   Property<bool, NoDefault> isTiltedAuto;
   Property<string, AutoDefault> tiltedLayerSpecFile;
 
+  // SKEWED: general properties
+  Property<double, AutoDefault> skewAngle;
+
+  // SKEWED MODE: UNIFORM IN PHI
+  Property<bool, Default> isSkewedUniformInPhi;
+
+  // SKEWED MODE: INSTALLATION (ONLY 2 LADDERS PER LAYER ARE SKEWED)
+  // input constraints
   Property<bool, Default> isSkewedForInstallation;
   Property<double, NoDefault> skewedModuleEdgeShift;
-  Property<double, Default> installationOverlapRatio;
-  
-  Property<double, AutoDefault> skewAngle;
+  Property<double, NoDefault> installationOverlapRatio;
+  // computed values of interest  
   Property<double, AutoDefault> skewedModuleMinRho;     // takes sensor thickness into account. 
                                                         // WARNING: min Rho is not compulsory reached at the skewed sensor edge!!
   Property<double, AutoDefault> skewedModuleCenterRho;
   Property<double, AutoDefault> skewedModuleMaxRho;     // takes sensor thickness into account
- 
+  // outputs
   Property<double, AutoDefault> unitPhiOverlapLength;
   Property<double, AutoDefault> installationHorizontalOverlapLength; 
 
@@ -134,9 +142,11 @@ public:
 	    isTilted       ("isTilted"       , parsedOnly(), false),
 	    isTiltedAuto   ("isTiltedAuto"   , parsedOnly()),
             tiltedLayerSpecFile("tiltedLayerSpecFile", parsedOnly()),
+	    skewAngle      ("skewAngle"      , parsedOnly()),
+	    isSkewedUniformInPhi("isSkewedUniformInPhi", parsedOnly(), false),
 	    isSkewedForInstallation("isSkewedForInstallation", parsedOnly(), false),
 	    skewedModuleEdgeShift("skewedModuleEdgeShift", parsedOnly()),
-	    installationOverlapRatio("installationOverlapRatio", parsedOnly(), 2.), // remove default??
+	    installationOverlapRatio("installationOverlapRatio", parsedOnly()),
 	    materialObject_(MaterialObject::LAYER, subdetectorName),
             flangeConversionStation_(nullptr),
 	    subdetectorName_(subdetectorName),

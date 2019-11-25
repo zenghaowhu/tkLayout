@@ -153,7 +153,7 @@ void Layer::check() {
   PropertyObject::check();
 
   // UNTILTED LAYER
-  if (!isTilted() && !isSkewedForInstallation()) {
+  if (!isTilted() && !isSkewedUniformInPhi() && !isSkewedForInstallation()) {
     if (buildNumModules() > 0 && maxZ.state()) throw PathfulException("Only one between numModules and maxZ can be specified");
     if (buildNumModules() == 0 && !maxZ.state()) throw PathfulException("At least one between numModules and maxZ must be specified");
     if (numRods.state() && (phiOverlap.state() || phiSegments.state())) throw PathfulException("Flat layer : Only one between numRods  and (phiOverlap + phiSegments) can be specified.");
@@ -188,15 +188,33 @@ void Layer::check() {
   }
 
   // SKEWED LAYER
-  if (isSkewedForInstallation()) {
-    if (!skewedModuleEdgeShift.state()) throw PathfulException("Skewed layer mode: skewedModuleEdgeShift must be specified.");
-    if (!numRods.state()) throw PathfulException("Skewed layer mode: numRods must be specified.");
-    if (radiusMode() != RadiusMode::FIXED) throw PathfulException("Skewed layer mode: the (average) radii of layers must be specified.");
+  // Mode A: all ladders are distributed uniformly in phi
+  if (isSkewedUniformInPhi()) {
+    if (fabs(skewAngle()) < insur::geom_zero) throw PathfulException("Skewed layer, uniform in phi mode: skewedAngle must be specified.");
+    if (!numRods.state()) throw PathfulException("Skewed layer, uniform in phi mode: numRods must be specified.");
+    if (radiusMode() != RadiusMode::FIXED) throw PathfulException("Skewed layer, uniform in phi mode: the (average) radii of layers must be specified.");
     if (isTilted()) throw PathfulException("A layer was set to both skewed and tilted: this is not presently supported.");
-    if (phiForbiddenRanges.state()) throw PathfulException("Skewed layer mode: phiForbiddenRange is not supported.");
-    if (rotateLayerByRodsDeltaPhiHalf()) throw PathfulException("Skewed layer mode: rotateLayerByRodsDeltaPhiHalf is not supported.");
-    if (phiOverlap.state()) throw PathfulException("Skewed layer mode: phiOverlap should not be specified.");
-    if (phiSegments.state()) throw PathfulException("Skewed layer mode: phiSegments should not be specified.");
+    if (isSkewedForInstallation()) throw PathfulException("A layer was set to both skewed uniform in phi, and skewed installation modes.");
+    if (skewedModuleEdgeShift.state()) throw PathfulException("Skewed layer, uniform in phi mode: skewedModuleEdgeShift should not be specified.");
+    if (installationOverlapRatio.state()) throw PathfulException("Skewed layer, uniform in phi mode: installationOverlapRatio should not be specified.");   
+    //if (phiForbiddenRanges.state()) throw PathfulException("Skewed layer, uniform in phi mode: phiForbiddenRange is not supported.");
+    //if (rotateLayerByRodsDeltaPhiHalf()) throw PathfulException("Skewed layer, uniform in phi mode: rotateLayerByRodsDeltaPhiHalf is not supported.");
+    if (phiOverlap.state()) throw PathfulException("Skewed layer, uniform in phi mode: phiOverlap should not be specified.");
+    if (phiSegments.state()) throw PathfulException("Skewed layer, uniform in phi mode: phiSegments should not be specified.");
+  }
+  // Mode B: Phase 2 Inner Tracker installation mode: only 2 ladders per layer are skewed.
+  if (isSkewedForInstallation()) {
+    if (!skewedModuleEdgeShift.state()) throw PathfulException("Skewed layer, installation mode: skewedModuleEdgeShift must be specified.");
+    if (!installationOverlapRatio.state()) throw PathfulException("Skewed layer, installation mode: installationOverlapRatio must be specified.");
+    if (!numRods.state()) throw PathfulException("Skewed layer, installation mode: numRods must be specified.");
+    if (radiusMode() != RadiusMode::FIXED) throw PathfulException("Skewed layer, installation mode: the (average) radii of layers must be specified.");
+    if (isTilted()) throw PathfulException("A layer was set to both skewed and tilted: this is not presently supported.");
+    if (isSkewedUniformInPhi()) throw PathfulException("A layer was set to both skewed uniform in phi, and skewed installation modes.");
+    if (fabs(skewAngle()) > insur::geom_zero) throw PathfulException("Skewed layer, installation mode: skewedAngle should not be specified.");
+    if (phiForbiddenRanges.state()) throw PathfulException("Skewed layer, installation mode: phiForbiddenRange is not supported.");
+    if (rotateLayerByRodsDeltaPhiHalf()) throw PathfulException("Skewed layer, installation mode: rotateLayerByRodsDeltaPhiHalf is not supported.");
+    if (phiOverlap.state()) throw PathfulException("Skewed layer, installation mode: phiOverlap should not be specified.");
+    if (phiSegments.state()) throw PathfulException("Skewed layer, installation mode: phiSegments should not be specified.");
   }
 }
 
@@ -262,12 +280,13 @@ void Layer::cutAtEta(double eta) {
 
 /*
  * Build a straight layer (with opposition to tilted layer).
- * The layer can be skewed around the (X=0) plane if requested.
+ * The ladders can be skewed around the (CMS_Z) axis if requested.
  */
 void Layer::buildStraight() {
 
   // COMPUTES A ROD TEMPLATE
-  RodTemplate rodTemplate = makeRodTemplate();
+  const double orientedSkewAngle = (!isSkewedUniformInPhi() ? 0 : bigParity() * skewAngle());
+  RodTemplate rodTemplate = makeRodTemplate(orientedSkewAngle);
 
   // MID-RADIUS PLACEMENT AND NUMRODS
   computePlaceRadiiAndNumRods(rodTemplate);  
@@ -324,14 +343,19 @@ void Layer::buildStraight() {
  * Create a template untilted rod (can be skewed).
  */
 RodTemplate Layer::makeRodTemplate(const double skewAngle) {
+    //just for debugging --Zeng Hao
+    std::cout << "The input skewAngle is " << skewAngle << endl;
+    std::cout <<"###############Print the skewAngle of each rod##############" << endl;
   RodTemplate rodTemplate(buildNumModules() > 0 ? buildNumModules() : (!ringNode.empty() ? ringNode.rbegin()->first + 1 : 1)); // + 1 to make room for a default constructed module to use when building rods in case the rodTemplate vector doesn't have enough elements
   const int numModules = rodTemplate.size();
   for (int i = 0; i < numModules; i++) {
     rodTemplate[i] = std::move(unique_ptr<BarrelModule>(GeometryFactory::make<BarrelModule>(GeometryFactory::make<RectangularModule>(), subdetectorName())));
     rodTemplate[i]->store(propertyTree());
     if (ringNode.count(i+1) > 0) rodTemplate[i]->store(ringNode.at(i+1));
-    if (isSkewedForInstallation()) rodTemplate[i]->skewAngle(skewAngle);
+    if (isSkewedUniformInPhi() || isSkewedForInstallation()) rodTemplate[i]->skewAngle(skewAngle);
     rodTemplate[i]->build();
+    //just for debugging
+    std::cout << "skewAngle=" << rodTemplate[i]->skewAngle() << endl;
   }
   return rodTemplate;
 }
@@ -733,7 +757,7 @@ void Layer::buildAndStoreClonedRodsInSkewedMode(const StraightRodPair* firstRod,
   
   const int numRodsPerXSide = numRods() / 2;
   double lastNonSkewedRodCenterPhi = 0.;  // Phi of the center of the last non-skewed rod which has been computed.
-                                          // This will in turn be used to computed the phi of the skewed rod.
+                                          // This will in turn be used to compute the phi of the skewed rod.
 
   // LOOP ON ALL RODS
   // NB: Works on one (X) side.
@@ -768,6 +792,7 @@ double Layer::buildAndStoreNonSkewedRodsInSkewedMode(const int rodId, const int 
   double lastNonSkewedRodCenterPhi = 0.;
 
   // CLONE RODS
+  // if rodId is odd: clone firstRod, otherwise clone secondRod.
   StraightRodPair* rod = (rodId-1)%2 ? GeometryFactory::clone(*secondRod) : GeometryFactory::clone(*firstRod);
   const double firstRodCenterPhi = firstRod->Phi();
   const double secondRodCenterPhi = secondRod->Phi();
@@ -777,6 +802,8 @@ double Layer::buildAndStoreNonSkewedRodsInSkewedMode(const int rodId, const int 
 
   // FIRST 2 RODS
   // if bigParity() > 0, mirror all rods phi placements through the (XZ) plane.
+  // In practice, need to mirror through (YZ) plane (ie, consider M_PI - angle instead of angle).
+  // Then everytheing end up being rotated by a global Pi/2 rotation around CMS_Z.
   if (rodId <= 2 && bigParity() > 0) {
     const double rodPhiPosition = M_PI - rodClonedPhi; // mirror through (XZ) plane.
     rod->rotateZ(-rodClonedPhi + rodPhiPosition);      // -rodClonedPhi is to remove whatever phi position the rod already has.
