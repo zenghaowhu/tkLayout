@@ -1,0 +1,60 @@
+// Pixel module common components (no bumps, no cooling blocks, no connectivity)
+
+Component {
+    componentName "IT Module: Glue support"
+    service false
+    scaleOnSensor 0
+    Element {
+        elementName Epoxy
+        quantity 0.015     //  
+        unit mm           // Watch out! all quantities in mm are scaled on the surface of the ACTIVE SENSOR (width x length parameters)
+        targetVolume 1
+                                        
+        }
+}
+
+Component {
+    componentName "IT Module: Flex cable"
+    service false
+    scaleSensor 0
+    Element {
+         elementName Kapton
+         quantity 0.050
+         unit mm
+         targetVolume 1   
+    }
+    
+    Element {
+        elementName Al
+        quantity 0.0178
+        unit mm
+        targetVolume 1
+    }
+}
+
+Component {
+    componentName "IT Module: Glue sensor"
+    service false
+    scaleOnSensor 0
+    Element {
+        elementName Epoxy
+        quantity 0.015     //  
+        unit mm           // Watch out! all quantities in mm are scaled on the surface of the ACTIVE SENSOR (width x length parameters)
+        targetVolume 1
+                                        
+        }
+}
+
+Component {
+  componentName "IT Module: Sensor" 
+  service false
+  scaleOnSensor 0
+  Element {
+    elementName SenSi
+    quantity 0.05       
+    unit mm             // Watch out! all quantities in mm are scaled on the surface of the ACTIVE SENSOR (width x length parameters)
+    targetVolume 2
+  }
+}
+
+

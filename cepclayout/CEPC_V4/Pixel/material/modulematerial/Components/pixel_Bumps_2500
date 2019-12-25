@@ -1,0 +1,14 @@
+// Bumps for a 2500 um^2 pixel size
+// Bump size like Phase-1
+
+Component {
+  componentName "IT Module: Bump bonds"
+  service false 
+  scaleOnSensor 0
+  Element {
+    elementName Pix_Bumps
+    quantity 0.017
+    unit mm
+    targetVolume 3
+  }
+}
