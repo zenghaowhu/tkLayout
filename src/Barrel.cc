@@ -37,10 +37,16 @@ void Barrel::build() {
       layer->build();
 
       // Additional barrel rotation
+      // just for debugging ---by Zeng Hao
+      std::cout << "############Print barrelRotation##############" << endl;
       layer->rotateZ(barrelRotation());
+      std::cout << "barrelRotation=" << barrelRotation() << endl;
       if (rotateBarrelByHalfPi()) { layer->rotateZ(M_PI / 2.); }
 
       // Additional layer rotation
+      // just for debugging -by Zeng Hao
+      std::cout << "#############Print layerRotation############" << endl;
+      std::cout << "layerRotation=" << layer->layerRotation() << endl;
       layer->rotateZ(layer->layerRotation());
 
       // Store the layer

@@ -3314,14 +3314,14 @@ void Analyzer::analyzeGeometry(Tracker& tracker, int nTracks /*=1000*/ ) {
     }
   }
   //following code just for debug -----by ZengHao
-  TFile map2D("/cefs/higgs/zengh/cepcLayout/CEPC_V4/outputfile/map2D.root","update");
-  std::cout << "Save the mapPhiEta(no average)..." ;
-  mapPhiEta.Write();
-  std::cout << "done" << endl;
-  std::cout << "Save the mapPhiEtaCount..." ;
-  mapPhiEtaCount.Write();
-  std::cout << "done" << endl;
-  map2D.Close();
+  /* TFile map2D("/cefs/higgs/zengh/cepcLayout/CEPC_V4/outputfile/map2D.root","update"); */
+  /* std::cout << "Save the mapPhiEta(no average)..." ; */
+  /* mapPhiEta.Write(); */
+  /* std::cout << "done" << endl; */
+  /* std::cout << "Save the mapPhiEtaCount..." ; */
+  /* mapPhiEtaCount.Write(); */
+  /* std::cout << "done" << endl; */
+  /* map2D.Close(); */
   //end of debug
 
 
@@ -3338,11 +3338,11 @@ void Analyzer::analyzeGeometry(Tracker& tracker, int nTracks /*=1000*/ ) {
     }
   }
   //for debug ----by ZengHao
-  std::cout << "Save the mapPhiEta(average)...";
-  TFile map2DAverage("/cefs/higgs/zengh/cepcLayout/CEPC_V4/outputfile/map2DAverage.root","update");
-  mapPhiEta.Write();
-  std::cout << "done" << endl;
-  map2DAverage.Close();
+  /* std::cout << "Save the mapPhiEta(average)..."; */
+  /* TFile map2DAverage("/cefs/higgs/zengh/cepcLayout/CEPC_V4/outputfile/map2DAverage.root","update"); */
+  /* mapPhiEta.Write(); */
+  /* std::cout << "done" << endl; */
+  /* map2DAverage.Close(); */
   //end of debug
 
 

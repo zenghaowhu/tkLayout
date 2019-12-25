@@ -3245,11 +3245,11 @@ namespace insur {
             //
         }
     //also for debug ----by ZengHao
-    std::cout << "Inefficiency histogram entries:" << efficiencyHistogram->GetEntries() << endl;
-    std::cout << "Entries of the first bin of inefficiency histogram:" << efficiencyHistogram->GetBinContent(1) << endl;
-    TFile eff("/cefs/higgs/zengh/cepcLayout/CEPC_V4/outputfile/effi_histo.root","update");
-    efficiencyHistogram->Write();
-    eff.Close();
+    /* std::cout << "Inefficiency histogram entries:" << efficiencyHistogram->GetEntries() << endl; */
+    /* std::cout << "Entries of the first bin of inefficiency histogram:" << efficiencyHistogram->GetBinContent(1) << endl; */
+    /* TFile eff("/cefs/higgs/zengh/cepcLayout/CEPC_V4/outputfile/effi_histo.root","update"); */
+    /* efficiencyHistogram->Write(); */
+    /* eff.Close(); */
     //end of debug
 
 
