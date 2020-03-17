@@ -1,0 +1,12 @@
+
+Materials BPIX_L1_1x2_2500 {
+  type module
+  //@include modulematerial/Components/pixel_Reference_Sensor_symbolic
+  //@include modulematerial/Components/pixel_BPIX_Cooling_Blocks_Heavy
+  @include modulematerial/Components/pixel_Module_Common_outer_Mingyi
+  //@include modulematerial/Components/pixel_Sensor_Dead_Area_1x2
+  //@include modulematerial/Components/pixel_Bumps_2500
+  //@include modulematerial/Components/pixel_Elinks_TBPX_L1
+  //@include modulematerial/Components/pixel_Chip_Caps
+  //@include modulematerail/Components/pixel_Chip_Caps
+}

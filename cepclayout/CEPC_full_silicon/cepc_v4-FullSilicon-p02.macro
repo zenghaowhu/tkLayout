@@ -1,0 +1,57 @@
+/Mokka/init/BatchMode false
+/Mokka/init/printLevel 2
+/Mokka/init/detectorModel CEPC_v4
+
+/Mokka/init/dbHost 202.122.37.75 
+/Mokka/init/user consult
+/Mokka/init/dbPasswd consult
+
+/Mokka/init/randomSeed 1000
+
+#/Mokka/init/EditGeometry/rmSubDetector yoke05
+#/Mokka/init/EditGeometry/rmSubDetector SCoil03
+#/Mokka/init/EditGeometry/rmSubDetector SEcal05
+#/Mokka/init/EditGeometry/rmSubDetector SHcalRpc01
+#/Mokka/init/EditGeometry/rmSubDetector LumiCalV_cepc_v4
+/Mokka/init/EditGeometry/rmSubDetector vxd07
+/Mokka/init/EditGeometry/rmSubDetector tpc10_01
+/Mokka/init/EditGeometry/rmSubDetector sit_simple_planar_sensors_03
+/Mokka/init/EditGeometry/rmSubDetector ftd_cepc_v4
+/Mokka/init/EditGeometry/rmSubDetector set_simple_planar_sensors_01
+/Mokka/init/EditGeometry/rmSubDetector tube_cepc_v4
+/Mokka/init/EditGeometry/rmSubDetector mask_cepc_v4
+/Mokka/init/EditGeometry/addSubDetector tube_cepc_MDI20171220pre 10
+/Mokka/init/EditGeometry/addSubDetector mask_cepc_MDI20170508before 20
+/Mokka/init/EditGeometry/newSubDetector SiTracker01  100
+
+/Mokka/init/globalModelParameter YokeUserLayer 1
+#/Mokka/init/globalModelParameter YokeGapThickness 325,400,500,25
+#/Mokka/init/globalModelParameter YokeIronThickness 200,200,300
+#/Mokka/init/globalModelParameter Coil_Yoke_lateral_clearance 328
+/Mokka/init/globalModelParameter YokeGapThickness 25,25,25,25,25,25,25,25,25,25,25,25
+/Mokka/init/globalModelParameter YokeIronThickness 100,100,100,100,100,100,100,100,100,100,100,100
+#/Mokka/init/globalModelParameter YokeLayerNumber 12
+#/Mokka/init/globalModelParameter YokeBarrelEndcapGap 5
+
+/Mokka/init/globalModelParameter SiTrackerBarrel VXD,15.9,78,10;VXD,25,125,10;VXD,36.9,150,11;VXD,38,150,11;VXD,57.9,175,17;VXD,59,175,17;SIT,153,368,10;SIT,156,368,10;SIT,321,644,19;SIT,324,644,19;SIT,603.4,920,38;SIT,606.4,920,38;SIT,1000,1380,62;SIT,1003,1380,62;SIT,1410,1840,89;SIT,1413,1840,89;SIT,1811,2300,115;SIT,1814,2300,115
+
+/Mokka/init/globalModelParameter SiTrackerEndcap FTD_PIXEL,30,150.76,220,16;FTD_PIXEL,50.6,150.76,371,16;FTD_STRIP,70.98,325,644,16;FTD_STRIP,110,611,920,16;FTD_STRIP,176,1004,1380,16;FTD_STRIP,234,1414,1840,16;FTD_STRIP,293,1815,2300,16
+
+/Mokka/init/globalModelParameter SiTrackerLayerStructure SIT,Si:-0.15,Si:0.0024,Peek:0.1,CarbonFiber:0.08,Rohacell50D:0.9,Epoxy:0.08,CarbonFiber:0.08;FTD_PIXEL,Si:-0.2,Si:0.0048,CarbonFiber:0.16,Rohacell50D:1.8,Peek:0.2;FTD_STRIP,Si:-0.15,Peek:0.2,CarbonFiber:0.16,Rohacell50D:1.8,Epoxy:0.175,CarbonFiber:0.16,Si:0.0048,Si:-0.15;VXD,Si:-0.05,kapton:0.05,aluminium:0.01,SiC_foam:0.94
+
+#Output lcio file 
+/Mokka/init/lcioFilename     cepc.slcio
+
+#option file for generator 
+/Mokka/init/initialMacroFile ../event.macro 
+
+#Delete previous lcioFile and create a new file, if want to append to old lcioFile, use WRITE_APPEND
+/Mokka/init/lcioWriteMode WRITE_NEW
+
+#Option to save step information in a CalorimeterHit
+#/Mokka/init/lcioDetailedShowerMode true
+#/Mokka/init/lcioStoreCalHitPosition true
+
+#Option to save momentum of particle to cause TrackerHit, user can choice one or more of these collections 
+#/Mokka/init/lcioDetailedTRKHitMode VXDCollection SITCollection TPCCollection SETCollection FTD_PIXELCollection FTD_STRIPCollection
+
