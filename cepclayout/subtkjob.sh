@@ -1,7 +1,7 @@
 #!/bin/bash
 
-geotracks=1000
-materialtracks=1000
+geotracks=50000
+materialtracks=3000
 
 export configurationdir=/cefs/higgs/zengh/tkLayout/cepclayout/CEPC_full_silicon
 export jobdir=/cefs/higgs/zengh/tkLayout/cepclayout/CEPC_full_silicon/jobfile
@@ -30,7 +30,7 @@ do
 	        sed -i "s#MatTrack#$materialtracks#g" ${jobdir}/${jobfile}.sh
 	        echo "${jobdir}/${jobfile}.sh"
 	        chmod +x ${jobdir}/${jobfile}.sh
-	        hep_sub ${jobdir}/${jobfile}.sh
+	        hep_sub ${jobdir}/${jobfile}.sh -mem 8000
 	        #sh $RecoWorkDir/$OUTPUTDATA/reco_${par}_${sjob}.sh
         fi
 
