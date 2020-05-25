@@ -344,8 +344,8 @@ void Layer::buildStraight() {
  */
 RodTemplate Layer::makeRodTemplate(const double skewAngle) {
     //just for debugging --Zeng Hao
-    std::cout << "The input skewAngle is " << skewAngle << endl;
-    std::cout <<"###############Print the skewAngle of each rod##############" << endl;
+    /* std::cout << "The input skewAngle is " << skewAngle << endl; */
+    /* std::cout <<"###############Print the skewAngle of each rod##############" << endl; */
   RodTemplate rodTemplate(buildNumModules() > 0 ? buildNumModules() : (!ringNode.empty() ? ringNode.rbegin()->first + 1 : 1)); // + 1 to make room for a default constructed module to use when building rods in case the rodTemplate vector doesn't have enough elements
   const int numModules = rodTemplate.size();
   for (int i = 0; i < numModules; i++) {
@@ -355,7 +355,7 @@ RodTemplate Layer::makeRodTemplate(const double skewAngle) {
     if (isSkewedUniformInPhi() || isSkewedForInstallation()) rodTemplate[i]->skewAngle(skewAngle);
     rodTemplate[i]->build();
     //just for debugging
-    std::cout << "skewAngle=" << rodTemplate[i]->skewAngle() << endl;
+    /* std::cout << "skewAngle=" << rodTemplate[i]->skewAngle() << endl; */
   }
   return rodTemplate;
 }

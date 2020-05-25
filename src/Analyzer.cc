@@ -3127,12 +3127,12 @@ void Analyzer::analyzeGeometry(Tracker& tracker, int nTracks /*=1000*/ ) {
   double randomBase = etaMinMax.first - (etaMinMax.second - etaMinMax.first)*(randomPercentMargin)/2.;
   double maxEta = etaMinMax.second *= (1 + randomPercentMargin);
   //just for debug ----by ZengHao
-  std::cout << endl;
-  std::cout << "etaMin=" << etaMinMax.first << endl;
-  std::cout << "etaMax=" << etaMinMax.second << endl;
-  std::cout << "randomSpan=" << randomSpan << endl;
-  std::cout << "randomBase=" << randomBase << endl;
-  std::cout << "maxEta=" << maxEta << endl;
+  /* std::cout << endl; */
+  /* std::cout << "etaMin=" << etaMinMax.first << endl; */
+  /* std::cout << "etaMax=" << etaMinMax.second << endl; */
+  /* std::cout << "randomSpan=" << randomSpan << endl; */
+  /* std::cout << "randomBase=" << randomBase << endl; */
+  /* std::cout << "maxEta=" << maxEta << endl; */
   //end of debug
 
 
