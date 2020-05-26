@@ -2884,9 +2884,11 @@ namespace insur {
       logINFO("PIXEL HACK for beam pipe");
       TPolyLine* beampipe  = new TPolyLine();
       beampipe->SetPoint(0, 0, 28/2.);
-      beampipe->SetPoint(1, 2915/2., 28/2.);
-      beampipe->SetPoint(2, 3804/2., 56.6/2.);
-      beampipe->SetPoint(3, 3804/2.+1164, 91/2.);
+      beampipe->SetPoint(1, 118, 28/2.);
+      beampipe->SetPoint(2, 400, 400*tan(8*M_PI/180));
+      /* beampipe->SetPoint(3, 3804/2.+1164, 91/2.); */
+      TLine *tube = new TLine(0,150,400,150);
+      tube->SetLineColor(kBlue);
       for (auto& XYCanvasEC : XYCanvasesEC) {
 	XYCanvasEC->cd();
 	drawCircle(14.0, true, 18); // "grey18"
@@ -2895,14 +2897,16 @@ namespace insur {
       drawCircle(14.0, true, 18); // "grey18"
       RZCanvas->cd();
       beampipe->Draw("same");
+      tube->Draw("same");
       RZCanvasBarrel->cd();
       beampipe->Draw("same");
+      /* tube->Draw("same"); */
 
-      RZCanvas->cd();
-      TPolyLine* etafour  = new TPolyLine();
-      etafour->SetPoint(0, 0, 0);
-      etafour->SetPoint(1, 2700, 98.9376398798);
-      etafour->Draw("same");
+      /* RZCanvas->cd(); */
+      /* TPolyLine* etafour  = new TPolyLine(); */
+      /* etafour->SetPoint(0, 0, 0); */
+      /* etafour->SetPoint(1, 2700, 98.9376398798); */
+      /* etafour->Draw("same"); */
     }
     // createColorPlotCanvas(tracker, 1, RZCanvas);
 
@@ -2945,31 +2949,31 @@ namespace insur {
     myCanvas.reset(new TCanvas("EtaProfileHits", "Eta profile (Hit Modules)", vis_min_canvas_sizeX, vis_min_canvas_sizeY));
     drawEtaProfiles(*myCanvas.get(), analyzer);
     myImage = new RootWImage(std::move(myCanvas), vis_min_canvas_sizeX, vis_min_canvas_sizeY);
-    myImage->setComment("Hit modules across eta.");
+    myImage->setComment("Hit modules across costheta.");
     myContent->addItem(myImage);
 
     myCanvas.reset(new TCanvas("EtaProfileSensors", "Eta profile (Hits)", vis_min_canvas_sizeX, vis_min_canvas_sizeY));
     drawEtaProfilesSensors(*myCanvas.get(), analyzer);
     myImage = new RootWImage(std::move(myCanvas), vis_min_canvas_sizeX, vis_min_canvas_sizeY);
-    myImage->setComment("Hit coverage across eta.");
+    myImage->setComment("Hit coverage across costheta.");
     myContent->addItem(myImage);
 
     myCanvas.reset(new TCanvas("EtaProfileStubs", "Eta profile (Stubs)", vis_min_canvas_sizeX, vis_min_canvas_sizeY));
     drawEtaProfilesStubs(*myCanvas.get(), analyzer);
     myImage = new RootWImage(std::move(myCanvas), vis_min_canvas_sizeX, vis_min_canvas_sizeY);
-    myImage->setComment("Stub coverage across eta.");
+    myImage->setComment("Stub coverage across costheta.");
     myContent->addItem(myImage);
 
     myCanvas.reset(new TCanvas("EtaProfileNumberOfStubsRatios", "Eta profile (Stubs)", vis_min_canvas_sizeX, vis_min_canvas_sizeY));
     if (myCanvas) drawTracksDistributionPerNumberOfStubs(*myCanvas.get(), analyzer, isPixelTracker);
     myImage = new RootWImage(std::move(myCanvas), vis_min_canvas_sizeX, vis_min_canvas_sizeY);
-    myImage->setComment("Stub coverage across eta.");
+    myImage->setComment("Stub coverage across costheta.");
     myContent->addItem(myImage);
 
     myCanvas.reset(new TCanvas("EtaProfileLayers", "Eta profile (Layers)", vis_min_canvas_sizeX, vis_min_canvas_sizeY));
     drawEtaProfilesLayers(*myCanvas.get(), analyzer);
     myImage = new RootWImage(std::move(myCanvas), vis_min_canvas_sizeX, vis_min_canvas_sizeY);
-    myImage->setComment("Layer coverage across eta.");
+    myImage->setComment("Layer coverage across costheta.");
     myContent->addItem(myImage);
 
     if (!isPixelTracker) {
@@ -2991,7 +2995,7 @@ namespace insur {
     analyzer.getMapPhiEta().SetStats(0);
     hitMapCanvas->Modified();
     myImage = new RootWImage(std::move(hitMapCanvas), vis_min_canvas_sizeX, vis_min_canvas_sizeY);
-    myImage->setComment("Hit coverage in eta, phi");
+    myImage->setComment("Hit coverage in costheta, phi");
     myContent->addItem(myImage);
 
     drawHitCoveragePerLayer(*myPage, analyzer, isPixelTracker);
@@ -3180,7 +3184,7 @@ namespace insur {
     for (auto& layerIt : coveragePerLayer) {
       const std::string layerName = layerIt.first;
 
-      std::unique_ptr<TCanvas> myCanvas(new TCanvas(Form("LayerCoverage%s%s", layerName.c_str(), type.c_str()), ("Layer eta coverage (" + type + ")").c_str(), vis_std_canvas_sizeX, vis_min_canvas_sizeY));
+      std::unique_ptr<TCanvas> myCanvas(new TCanvas(Form("LayerCoverage%s%s", layerName.c_str(), type.c_str()), ("Layer costheta coverage (" + type + ")").c_str(), vis_std_canvas_sizeX, vis_min_canvas_sizeY));
       myCanvas->cd();
 
       // Distribution of tracks with at least 1 hit / stub.
@@ -3232,7 +3236,7 @@ namespace insur {
 	upperRightPad->cd();
 	TH1D* efficiencyHistogram = new TH1D(Form("%s_histo", overallCoverage.GetName()), overallCoverage.GetTitle(), 50, 0, .1);
 	efficiencyHistogram->SetXTitle("Inefficiency");
-	efficiencyHistogram->SetYTitle("Eta bins");
+	efficiencyHistogram->SetYTitle("cosTheta bins");
 	efficiencyHistogram->SetFillColor(Palette::color(1));
 	efficiencyHistogram->Draw();
 	for (int i=1; i<=overallCoverage.GetNbinsX(); ++i) 
@@ -3276,7 +3280,7 @@ namespace insur {
 
       RootWImage* myImage = new RootWImage(std::move(myCanvas), vis_std_canvas_sizeX, vis_min_canvas_sizeY);
       const std::string title = (type.find("stub") != std::string::npos ? "stub" : type);
-      myImage->setComment("Layer coverage in eta for " + title + "s.");
+      myImage->setComment("Layer coverage in costheta for " + title + "s.");
       myContent->addItem(myImage);
     }
 

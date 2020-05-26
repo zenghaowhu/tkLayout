@@ -2764,10 +2764,10 @@ void Analyzer::prepareTriggerProcessorHistograms() {
 void Analyzer::clearGeometryHistograms() {
   // geometry analysis
   mapPhiEta.Reset();
-  mapPhiEta.SetNameTitle("mapPhiEta", "Number of hits;#phi;#eta");
+  mapPhiEta.SetNameTitle("mapPhiEta", "Number of hits;#phi;cos#theta");
   mapPhiEtaDTC.Reset();
-  mapPhiEtaDTC.SetNameTitle("mapPhiEtaDTC", "Number of distinct DTCs per track;#phi;#eta");
-  etaProfileCanvas.SetName("etaProfileCanvas"); etaProfileCanvas.SetTitle("Eta Profiles");
+  mapPhiEtaDTC.SetNameTitle("mapPhiCosThetaDTC", "Number of distinct DTCs per track;#phi;cos#theta");
+  etaProfileCanvas.SetName("etaProfileCanvas"); etaProfileCanvas.SetTitle("cosTheta Profiles");
   hitDistribution.Reset();
   hitDistribution.SetNameTitle("hitDistribution", "Hit distribution");
   //geomLite->SetName("geometryLite");   geomLite->SetTitle("Modules geometry");
@@ -3126,6 +3126,8 @@ void Analyzer::analyzeGeometry(Tracker& tracker, int nTracks /*=1000*/ ) {
   double randomSpan = (etaMinMax.second - etaMinMax.first)*(1. + randomPercentMargin);
   double randomBase = etaMinMax.first - (etaMinMax.second - etaMinMax.first)*(randomPercentMargin)/2.;
   double maxEta = etaMinMax.second *= (1 + randomPercentMargin);
+  /* std::cout << "maxEta= " << maxEta << endl; */
+  double max_costheta = TMath::Cos(2. * TMath::ATan(TMath::Exp(-1 * maxEta))); 
   //just for debug ----by ZengHao
   /* std::cout << endl; */
   /* std::cout << "etaMin=" << etaMinMax.first << endl; */
@@ -3151,14 +3153,14 @@ void Analyzer::analyzeGeometry(Tracker& tracker, int nTracks /*=1000*/ ) {
   for (std::map <std::string, int>::iterator it = moduleTypeCount.begin();
        it!=moduleTypeCount.end(); it++) {
     TProfile& aProfile = etaProfileByType[(*it).first];
-    aProfile.SetBins(100, 0, maxEta);  
+    aProfile.SetBins(100, 0, max_costheta);  
     aProfile.SetName((*it).first.c_str());
     aProfile.SetTitle((*it).first.c_str());
   }
 
   for (auto mel : sensorTypeCount) {
     TProfile& aProfileStubs = etaProfileByTypeSensors[mel.first];
-    aProfileStubs.SetBins(100, 0, maxEta);
+    aProfileStubs.SetBins(100, 0, max_costheta);
     aProfileStubs.SetName(mel.first.c_str());
     aProfileStubs.SetTitle(mel.first.c_str());
   }
@@ -3168,7 +3170,7 @@ void Analyzer::analyzeGeometry(Tracker& tracker, int nTracks /*=1000*/ ) {
     // Indeed, 1 IT 'offline' stub can be on different modules types!
     for (auto mel : moduleTypeCountStubs) {
       TProfile& aProfileStubs = etaProfileByTypeStubs[mel.first];
-      aProfileStubs.SetBins(100, 0, maxEta);
+      aProfileStubs.SetBins(100, 0, max_costheta);
       aProfileStubs.SetName(mel.first.c_str());
       aProfileStubs.SetTitle(mel.first.c_str());
     }
@@ -3181,17 +3183,17 @@ void Analyzer::analyzeGeometry(Tracker& tracker, int nTracks /*=1000*/ ) {
   int nTracksPerSide = int(pow(nTracks, 0.5));
   int nBlocks = int(nTracksPerSide/2.);
   nTracks = nTracksPerSide*nTracksPerSide;
-  mapPhiEta.SetBins(nBlocks, -1*M_PI, M_PI, nBlocks, -maxEta, maxEta);
-  mapPhiEtaDTC.SetBins(nBlocks, -1*M_PI, M_PI, nBlocks, -maxEta, maxEta);
-  TH2I mapPhiEtaCount("mapPhiEtaCount ", "phi Eta hit count", nBlocks, -1*M_PI, M_PI, nBlocks, -maxEta, maxEta);
+  mapPhiEta.SetBins(nBlocks, -1*M_PI, M_PI, nBlocks, -max_costheta, max_costheta);
+  mapPhiEtaDTC.SetBins(nBlocks, -1*M_PI, M_PI, nBlocks, -max_costheta, max_costheta);
+  TH2I mapPhiEtaCount("mapPhiCosThetaCount ", "phi CosTheta hit count", nBlocks, -1*M_PI, M_PI, nBlocks, -max_costheta, max_costheta);
   totalEtaProfile.Reset();
   totalEtaProfile.SetName("totalEtaProfile");
   totalEtaProfile.SetMarkerStyle(8);
   totalEtaProfile.SetMarkerColor(1);
   totalEtaProfile.SetLineColor(1);
   totalEtaProfile.SetMarkerSize(1.5);
-  totalEtaProfile.SetTitle("Number of modules with at least one hit;#eta;Number of hit modules");
-  totalEtaProfile.SetBins(100, 0, maxEta);
+  totalEtaProfile.SetTitle("Number of modules with at least one hit;cos#theta;Number of hit modules");
+  totalEtaProfile.SetBins(100, 0, max_costheta);
   totalEtaProfile.SetStats(0);
 
   totalEtaProfileSensors.Reset();
@@ -3200,8 +3202,8 @@ void Analyzer::analyzeGeometry(Tracker& tracker, int nTracks /*=1000*/ ) {
   totalEtaProfileSensors.SetMarkerColor(1);
   totalEtaProfileSensors.SetLineColor(1);
   totalEtaProfileSensors.SetMarkerSize(1.5);
-  totalEtaProfileSensors.SetTitle("Number of hits;#eta;Number of hits");
-  totalEtaProfileSensors.SetBins(100, 0, maxEta);
+  totalEtaProfileSensors.SetTitle("Number of hits;cos#theta;Number of hits");
+  totalEtaProfileSensors.SetBins(100, 0, max_costheta);
   totalEtaProfileSensors.SetStats(0);
 
   totalEtaProfileStubs.Reset();
@@ -3210,17 +3212,17 @@ void Analyzer::analyzeGeometry(Tracker& tracker, int nTracks /*=1000*/ ) {
   totalEtaProfileStubs.SetMarkerColor(1);
   totalEtaProfileStubs.SetLineColor(1);
   totalEtaProfileStubs.SetMarkerSize(1.5);
-  if (!tracker.isPixelTracker()) { totalEtaProfileStubs.SetTitle("Number of modules with a stub;#eta;Number of stubs"); }
-  else { totalEtaProfileStubs.SetTitle("Number of stubs;#eta;Number of stubs"); }
-  totalEtaProfileStubs.SetBins(100, 0, maxEta);
+  if (!tracker.isPixelTracker()) { totalEtaProfileStubs.SetTitle("Number of modules with a stub;cos#theta;Number of stubs"); }
+  else { totalEtaProfileStubs.SetTitle("Number of stubs;cos#theta;Number of stubs"); }
+  totalEtaProfileStubs.SetBins(100, 0, max_costheta);
   totalEtaProfileStubs.SetStats(0);
 
   // CREATE PLOTS: distribution of tracks per number of stubs.
   const int plotMaxNumberOfStubs = (!tracker.isPixelTracker() ? plotMaxNumberOfOuterTrackerStubs :  plotMaxNumberOfInnerTrackerStubs);
   for (int numberOfStubs = 0; numberOfStubs <= plotMaxNumberOfStubs; numberOfStubs++) {
     TProfile stubProfile = TProfile( Form("layerEtaCoverageProfileNumberOfStubs%d", numberOfStubs), 
-				     "Distribution of number of stub(s) per track;#eta;Fraction of tracks", 
-				     30, 0, maxEta); 
+				     "Distribution of number of stub(s) per track;cos#theta;Fraction of tracks", 
+				     30, 0, max_costheta); 
     tracksDistributionPerNumberOfStubs_[numberOfStubs] = stubProfile;
   }
 
@@ -3230,12 +3232,12 @@ void Analyzer::analyzeGeometry(Tracker& tracker, int nTracks /*=1000*/ ) {
   totalEtaProfileLayers.SetMarkerColor(1);
   totalEtaProfileLayers.SetLineColor(1);
   totalEtaProfileLayers.SetMarkerSize(1.5);
-  totalEtaProfileLayers.SetTitle("Number of layers with at least a hit;#eta;Number of layers");
-  totalEtaProfileLayers.SetBins(100, 0, maxEta);
+  totalEtaProfileLayers.SetTitle("Number of layers with at least a hit;cos#theta;Number of layers");
+  totalEtaProfileLayers.SetBins(100, 0, max_costheta);
   totalEtaProfileLayers.SetStats(0);
 
   // CREATE COVERAGE PER LAYER PLOTS
-  createCoveragePerLayerPlots(layerNames, tracker.isPixelTracker(), maxEta);
+  createCoveragePerLayerPlots(layerNames, tracker.isPixelTracker(), max_costheta);
 
   std::map<std::string, int> modulePlotColors; // CUIDADO quick and dirty way of creating a map with all the module colors (a cleaner way would be to have the map already created somewhere else)
 
@@ -3369,7 +3371,7 @@ void Analyzer::analyzeGeometry(Tracker& tracker, int nTracks /*=1000*/ ) {
 
   //TProfile* total = total2D.ProfileX("etaProfileTotal");
   char profileName_[256];
-  sprintf(profileName_, "etaProfileTotal%d", bsCounter++);
+  sprintf(profileName_, "costhetaProfileTotal%d", bsCounter++);
   // totalEtaProfile = TProfile(*total2D.ProfileX(profileName_));
   savingGeometryV.push_back(totalEtaProfile);
   const double plotNumberOfHitModulesMaxY = (!tracker.isPixelTracker() ? plotNumberOfOuterTrackerHitModulesMaxY : plotNumberOfInnerTrackerHitModulesMaxY);
@@ -3389,10 +3391,10 @@ void Analyzer::analyzeGeometry(Tracker& tracker, int nTracks /*=1000*/ ) {
     myProfile->SetMarkerColor(Palette::color(modulePlotColors[it->first]));
     myProfile->SetLineColor(Palette::color(modulePlotColors[it->first]));
     myProfile->SetMarkerSize(1);
-    std::string profileName = "etaProfile"+(*it).first;
+    std::string profileName = "costhetaProfile"+(*it).first;
     myProfile->SetName(profileName.c_str());
     myProfile->SetTitle((*it).first.c_str());
-    myProfile->GetXaxis()->SetTitle("eta");
+    myProfile->GetXaxis()->SetTitle("cos#theta");
     myProfile->GetYaxis()->SetTitle("Number of hit modules");
     myProfile->Draw("same");
     typeEtaProfile.push_back(*myProfile);
@@ -3405,10 +3407,10 @@ void Analyzer::analyzeGeometry(Tracker& tracker, int nTracks /*=1000*/ ) {
     myProfile->SetMarkerColor(Palette::color(modulePlotColors[it->first]));
     myProfile->SetLineColor(Palette::color(modulePlotColors[it->first]));
     myProfile->SetMarkerSize(1);
-    std::string profileName = "etaProfileSensors"+(*it).first;
+    std::string profileName = "costhetaProfileSensors"+(*it).first;
     myProfile->SetName(profileName.c_str());
     myProfile->SetTitle((*it).first.c_str());
-    myProfile->GetXaxis()->SetTitle("eta");
+    myProfile->GetXaxis()->SetTitle("cos#theta");
     myProfile->GetYaxis()->SetTitle("Number of hits");
     myProfile->Draw("same");
     typeEtaProfileSensors.push_back(*myProfile);
@@ -3422,10 +3424,10 @@ void Analyzer::analyzeGeometry(Tracker& tracker, int nTracks /*=1000*/ ) {
       myProfile->SetMarkerColor(Palette::color(modulePlotColors[it->first]));
       myProfile->SetLineColor(Palette::color(modulePlotColors[it->first]));
       myProfile->SetMarkerSize(1);
-      std::string profileName = "etaProfileStubs"+(*it).first;
+      std::string profileName = "costhetaProfileStubs"+(*it).first;
       myProfile->SetName(profileName.c_str());
       myProfile->SetTitle((*it).first.c_str());
-      myProfile->GetXaxis()->SetTitle("eta");
+      myProfile->GetXaxis()->SetTitle("cos#theta");
       myProfile->GetYaxis()->SetTitle("Number of stubs");
       myProfile->Draw("same");
       typeEtaProfileStubs.push_back(*myProfile);
@@ -3526,8 +3528,8 @@ void Analyzer::createGeometryLite(Tracker& tracker) {
 
     // private
     /**
-     * Shoots directions with random (flat) phi, random (flat) pseudorapidity
-     * gives also the direction's eta
+     * Shoots directions with random (flat) phi, random (flat) costheta
+     * gives also the direction's costheta
      * @param minEta minimum eta to shoot tracks
      * @param spanEta difference between minimum and maximum eta
      * @return the pair of value: pointing XYZVector and eta of the track
@@ -3535,20 +3537,23 @@ void Analyzer::createGeometryLite(Tracker& tracker) {
     std::pair <XYZVector, double > Analyzer::shootDirection(double minEta, double spanEta) {
       std::pair <XYZVector, double> result;
 
-      double eta;
+      double costheta;
       double phi;
       double theta;
 
       // phi is random [0, 2pi)
       phi = myDice.Rndm() * 2 * M_PI; // debug
 
-      // eta is random (-4, 4]
-      eta = myDice.Rndm() * spanEta + minEta;
-      theta=2*atan(exp(-1*eta));
+      // costheta is random (-1, 1]
+      /* costheta = myDice.Rndm() * cos(2*atan(exp(-1*spanEta))) + cos(2*atan(exp(-1*minEta))); */
+      costheta = myDice.Rndm() * 2 - 1;
+      /* std::cout << "spanEta= " << spanEta << "; minEta= " << minEta << "; "; */
+      /* std::cout << "costheta= " << costheta << endl; */
+      theta = acos(costheta);
 
       // Direction
       result.first  = XYZVector(cos(phi)*sin(theta), sin(phi)*sin(theta), cos(theta));
-      result.second = eta;
+      result.second = costheta;
       return result;
     }
 
@@ -3792,7 +3797,7 @@ void Analyzer::createGeometryLite(Tracker& tracker) {
    */
   void Analyzer::createCoveragePerLayerPlots(const LayerNameVisitor& layerNames, 
 					     const bool isPixelTracker, 
-					     const double maxEta) {
+					     const double max_costheta) {
     hitCoveragePerLayer_.clear();
     hitCoveragePerLayerDetails_.clear();
     stubCoveragePerLayer_.clear();
@@ -3805,8 +3810,8 @@ void Analyzer::createGeometryLite(Tracker& tracker) {
       // HITS (>=1) PER LAYER
       TProfile hitsPerLayer = TProfile(Form("hitCoveragePerLayer%s", layerName.c_str()), 
 				       layerName.c_str(),
-				       200, maxEta, maxEta);
-      hitsPerLayer.GetXaxis()->SetTitle("#eta");
+				       200, max_costheta, max_costheta);
+      hitsPerLayer.GetXaxis()->SetTitle("cos#theta");
       hitsPerLayer.GetYaxis()->SetTitle("Fraction of tracks");
       hitCoveragePerLayer_[layerName] = hitsPerLayer;
 
@@ -3814,8 +3819,8 @@ void Analyzer::createGeometryLite(Tracker& tracker) {
       for (int numberOfHits = 1; numberOfHits <= plotMaxNumberOfHitsPerLayer; numberOfHits++) {
 	TProfile hitsCountPerLayer = TProfile(Form("hitCoveragePerLayerDetails%s%d", layerName.c_str(), numberOfHits), 
 					      layerName.c_str(),
-					      100, maxEta, maxEta);
-	hitsCountPerLayer.GetXaxis()->SetTitle("#eta");
+					      100, max_costheta, max_costheta);
+	hitsCountPerLayer.GetXaxis()->SetTitle("cos#theta");
 	hitsCountPerLayer.GetYaxis()->SetTitle("Fraction of tracks");
 	hitCoveragePerLayerDetails_[layerName][numberOfHits] = hitsCountPerLayer;
       }
@@ -3823,13 +3828,13 @@ void Analyzer::createGeometryLite(Tracker& tracker) {
       // STUBS PER LAYER
       // OT: hardware stub. 
       // IT: 1 stub <-> (>= 2 hits / layer).
-      const double stubsPerLayerMinX = (!isPixelTracker ? -maxEta : 0.);
-      const std::string stubsPerLayerXAxisTitle = (!isPixelTracker ? "#eta" : "|#eta|");
+      const double stubsPerLayerMinX = (!isPixelTracker ? -max_costheta : 0.);
+      const std::string stubsPerLayerXAxisTitle = (!isPixelTracker ? "cos#theta" : "|cos#theta|");
       // For Inner Tracker stubs per layer, all results gathered on (+Z) side.
       // Indeed, the worry is not about hermetic coverage as for OT, but to have very good resolution picks to distinguish rings.
       TProfile stubsPerLayer = TProfile(Form("stubCoveragePerLayer%s", layerName.c_str()),
 					layerName.c_str(),
-					400, stubsPerLayerMinX, maxEta);
+					400, stubsPerLayerMinX, max_costheta);
       stubsPerLayer.GetXaxis()->SetTitle(stubsPerLayerXAxisTitle.c_str());
       stubsPerLayer.GetYaxis()->SetTitle("Fraction of tracks");   
       stubCoveragePerLayer_[layerName] = stubsPerLayer;
@@ -3838,10 +3843,10 @@ void Analyzer::createGeometryLite(Tracker& tracker) {
       if (isPixelTracker) {
 	TProfile stubsWith3HitsPerLayer = TProfile(Form("stubWith3HitsCoveragePerLayer%s", layerName.c_str()),
 					  layerName.c_str(),
-					  600, stubsPerLayerMinX, maxEta);
+					  600, stubsPerLayerMinX, max_costheta);
 	// For Inner Tracker stubs per layer, all results gathered on (+Z) side.
 	// Indeed, the worry is not about hermetic coverage as for OT, but to have very good resolution picks to distinguish rings.
-	stubsWith3HitsPerLayer.GetXaxis()->SetTitle("|#eta|");
+	stubsWith3HitsPerLayer.GetXaxis()->SetTitle("|cos#theta|");
 	stubsWith3HitsPerLayer.GetYaxis()->SetTitle("Fraction of tracks");   
 	stubWith3HitsCoveragePerLayer_[layerName] = stubsWith3HitsPerLayer;
       }

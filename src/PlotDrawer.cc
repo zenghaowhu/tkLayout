@@ -97,16 +97,18 @@ template<class CoordType> void SummaryFrameStyle<CoordType>::drawEtaTicks(double
 
   TText* aLabel;
   char labelChar[10];
-  double eta;
+  double cos_theta;
 
   double thetaLimit = atan(startR/startL);
-  std::vector<double> etaSteps;
-  for (eta=0; eta<=etaMax; eta+=etaStep) etaSteps.push_back(eta);
-  if (etaLongLine>0) etaSteps.push_back(etaLongLine);
+  std::vector<double> costhetaSteps;
+  for (cos_theta=0; cos_theta<=0.9; cos_theta += 0.1) costhetaSteps.push_back(cos_theta);
+  for (cos_theta=0.9; cos_theta<=1.0; cos_theta += 0.01) costhetaSteps.push_back(cos_theta);
+  /* if (etaLongLine>0) costhetaSteps.push_back(cos(2 * atan(exp(-etaLongLine)))); */
 
-  for (std::vector<double>::iterator it = etaSteps.begin(); it!=etaSteps.end(); ++it) {
-    eta=*it;
-    theta = 2 * atan(exp(-eta));
+  for (std::vector<double>::iterator it = costhetaSteps.begin(); it!=costhetaSteps.end(); ++it) {
+    cos_theta=*it;
+    /* theta = 2 * atan(exp(-eta)); */
+    theta = acos(cos_theta);
 
     aTick->SetLineColor(kBlack);
     aTick->SetLineWidth(1);
@@ -115,12 +117,12 @@ template<class CoordType> void SummaryFrameStyle<CoordType>::drawEtaTicks(double
     } else {
       aTick->DrawLine(startL, startL * tan(theta), endL, endL * tan(theta));
     }
-    if ((eta==etaLongLine)&&(etaLongLine!=0)) {
-      aTick->SetLineColor(kGray);
-      if (theta>thetaLimit) aTick->DrawLine(0., 0., endR / tan(theta), endR);
-      else aTick->DrawLine(0., 0., endL, endL * tan(theta));
-      labelSize*=2;
-    }
+    /* if ((cos_theta==cos(2 * atan(exp(-etaLongLine))))&&(etaLongLine!=0)) { */
+      /* aTick->SetLineColor(kGray); */
+      /* if (theta>thetaLimit) aTick->DrawLine(0., 0., endR / tan(theta), endR); */
+      /* else aTick->DrawLine(0., 0., endL, endL * tan(theta)); */
+      /* labelSize*=2; */
+    /* } */
 
     if (labelSize!=0) {
       textX = (endR + textDistanceR) / tan(theta);
@@ -128,7 +130,7 @@ template<class CoordType> void SummaryFrameStyle<CoordType>::drawEtaTicks(double
       if (textX > (endL + textDistanceL)) textX = endL + textDistanceL;
       if (textY > (endR + textDistanceR)) textY = endR + textDistanceR;
 
-      sprintf(labelChar, "%.01f", eta);
+      sprintf(labelChar, "%.02f", cos_theta);
       aLabel = new TText(textX, textY, labelChar);
       aLabel->SetTextAlign(21);
       aLabel->SetTextSize(labelSize);
@@ -139,7 +141,7 @@ template<class CoordType> void SummaryFrameStyle<CoordType>::drawEtaTicks(double
 
   if (labelSize>0) {
     textY -= 3*tickLengthR;
-    aLabel = new TLatex(textX, textY, "#eta");
+    aLabel = new TLatex(textX, textY, "cos#theta");
     aLabel->SetTextFont(labelFont);
     aLabel->SetTextSize(labelSize);
     aLabel->Draw();
