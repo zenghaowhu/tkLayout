@@ -23,8 +23,8 @@ namespace insur {
   /**
    * Geometry constants.
    */
-  static const std::vector<std::string> geom_name_eta_regions  = {""   ,"C","I","F","VF","VVF"};  // Name tracker eta regions
-  static const std::vector<double>      geom_range_eta_regions = {0.001,0.8,1.6,2.4 ,3.2 ,4.0  }; // Name tracker eta regions
+  static const std::vector<std::string> geom_name_eta_regions  = {""   ,"C","I","F","VF","VVF"};  // Name tracker costheta regions
+  static const std::vector<double>      geom_range_eta_regions = {0.001,0.40,0.80,0.90 ,0.95 ,0.99  }; // Name tracker costheta regions
 
   static const double geom_zero                       = 1E-6;    // mm
   static const double geom_epsilon                    = 0.1;     // mm, standard distance between one solid object and the next.
@@ -114,7 +114,7 @@ namespace insur {
   static const int    vis_std_canvas_sizeY   = 900;
   static const int    vis_max_canvas_sizeY   =1800;
 
-  static const double vis_eta_step           = 0.1;
+  static const double vis_eta_step           = 0.01;
   static const int    vis_n_bins             = geom_max_eta_coverage/vis_eta_step;  // Default number of bins in histogram from eta=0  to max_eta_coverage
 
 

@@ -179,11 +179,11 @@ void Analyzer::createTaggedTrackCollection(std::vector<MaterialBudget*> material
   materialTracksUsed = etaSteps;
 
   int nTracks;
-  double etaStep, eta, theta, phi;
+  double costhetaStep, costheta, theta, phi;
 
-  // prepare etaStep, phiStep, nTracks, nScans
-  if (etaSteps > 1) etaStep = getEtaMaxTrigger() / (double)(etaSteps - 1);
-  else etaStep = getEtaMaxTrigger();
+  // prepare costhetaStep, phiStep, nTracks, nScans
+  if (etaSteps > 1) costhetaStep = getEtaMaxTrigger() / (double)(etaSteps - 1);
+  else costhetaStep = getEtaMaxTrigger();
   nTracks = etaSteps;
 
   // prepareTriggerPerformanceHistograms(nTracks, getEtaMaxTrigger(), triggerMomenta, thresholdProbabilities);
@@ -197,12 +197,12 @@ void Analyzer::createTaggedTrackCollection(std::vector<MaterialBudget*> material
   std::map<std::string, TrackCollectionMap> taggedTrackPCollectionMapIdeal;
 
 
-  for (int i_eta = 0; i_eta < nTracks; i_eta++) {
+  for (int i_costheta = 0; i_costheta < nTracks; i_costheta++) {
     phi = myDice.Rndm() * M_PI * 2.0;
     Material tmp;
     Track track;
-    eta = i_eta * etaStep;
-    theta = 2 * atan(exp(-eta)); 
+    costheta = i_costheta * costhetaStep;
+    theta = acos(costheta); 
     track.setThetaPhiPt(theta,phi,1*Units::TeV);
 
     track.setOrigin(getLuminousRegion());
@@ -211,7 +211,7 @@ void Analyzer::createTaggedTrackCollection(std::vector<MaterialBudget*> material
     tmp = findAllHits(mb, pm, track);
 
     // Debug: material amount
-    // std::cerr << "eta = " << eta
+    // std::cerr << "costheta = " << costheta
     //           << ", material.radiation = " << tmp.radiation
     //           << ", material.interaction = " << tmp.interaction
     //           << std::endl;
@@ -915,12 +915,12 @@ void Analyzer::analyzeMaterialBudget(MaterialBudget& mb, const std::vector<doubl
 
   materialTracksUsed = etaSteps;
   int nTracks;
-  double etaStep, eta, theta, phi;
+  double costhetaStep, costheta, theta, phi;
   clearMaterialBudgetHistograms();
   clearCells();
-  // prepare etaStep, phiStep, nTracks, nScans
-  if (etaSteps > 1) etaStep = getEtaMaxMaterial() / (double)(etaSteps - 1);
-  else etaStep = getEtaMaxMaterial();
+  // prepare costhetaStep, phiStep, nTracks, nScans
+  if (etaSteps > 1) costhetaStep = getEtaMaxMaterial() / (double)(etaSteps - 1);
+  else costhetaStep = getEtaMaxMaterial();
   nTracks = etaSteps;
   // reset the number of bins and the histogram boundaries (0.0 to getEtaMaxMaterial()) for all histograms, recalculate the cell boundaries
   setHistogramBinsBoundaries(nTracks, 0.0, getEtaMaxMaterial());
@@ -930,48 +930,48 @@ void Analyzer::analyzeMaterialBudget(MaterialBudget& mb, const std::vector<doubl
   // std::vector<Track> tv;
   // std::vector<Track> tvIdeal;
 
-  for (int i_eta = 0; i_eta < nTracks; i_eta++) {
+  for (int i_costheta = 0; i_costheta < nTracks; i_costheta++) {
     phi = myDice.Rndm() * M_PI * 2.0;
     Material tmp;
     Track track;
-    eta = i_eta * etaStep;
-    theta = 2 * atan(exp(-eta)); // TODO: switch to exp() here
+    costheta = i_costheta * costhetaStep;
+    theta = acos(costheta); // TODO: switch to exp() here
     track.setThetaPhiPt(theta,phi,1*Units::TeV);
     track.setOrigin(getLuminousRegionInMatBudgetAnalysis());
     //      active volumes, barrel
     std::map<std::string, Material> sumComponentsRI;
     tmp = analyzeModules(mb.getBarrelModuleCaps(), track, sumComponentsRI);
-    ractivebarrel.Fill(eta, tmp.radiation);
-    iactivebarrel.Fill(eta, tmp.interaction);
-    rbarrelall.Fill(eta, tmp.radiation);
-    ibarrelall.Fill(eta, tmp.interaction);
-    ractiveall.Fill(eta, tmp.radiation);
-    iactiveall.Fill(eta, tmp.interaction);
-    rglobal.Fill(eta, tmp.radiation);
-    iglobal.Fill(eta, tmp.interaction);
+    ractivebarrel.Fill(costheta, tmp.radiation);
+    iactivebarrel.Fill(costheta, tmp.interaction);
+    rbarrelall.Fill(costheta, tmp.radiation);
+    ibarrelall.Fill(costheta, tmp.interaction);
+    ractiveall.Fill(costheta, tmp.radiation);
+    iactiveall.Fill(costheta, tmp.interaction);
+    rglobal.Fill(costheta, tmp.radiation);
+    iglobal.Fill(costheta, tmp.interaction);
 
     //      active volumes, endcap
     tmp = analyzeModules(mb.getEndcapModuleCaps(), track, sumComponentsRI);
-    ractiveendcap.Fill(eta, tmp.radiation);
-    iactiveendcap.Fill(eta, tmp.interaction);
-    rendcapall.Fill(eta, tmp.radiation);
-    iendcapall.Fill(eta, tmp.interaction);
-    ractiveall.Fill(eta, tmp.radiation);
-    iactiveall.Fill(eta, tmp.interaction);
-    rglobal.Fill(eta, tmp.radiation);
-    iglobal.Fill(eta, tmp.interaction);
+    ractiveendcap.Fill(costheta, tmp.radiation);
+    iactiveendcap.Fill(costheta, tmp.interaction);
+    rendcapall.Fill(costheta, tmp.radiation);
+    iendcapall.Fill(costheta, tmp.interaction);
+    ractiveall.Fill(costheta, tmp.radiation);
+    iactiveall.Fill(costheta, tmp.interaction);
+    rglobal.Fill(costheta, tmp.radiation);
+    iglobal.Fill(costheta, tmp.interaction);
 
     for (std::map<std::string, Material>::iterator it = sumComponentsRI.begin(); it != sumComponentsRI.end(); ++it) {
       if (rComponents[it->first]==NULL) { 
         rComponents[it->first] = new TH1D();
         rComponents[it->first]->SetBins(nTracks, 0.0, getEtaMaxMaterial()); 
       }
-      rComponents[it->first]->Fill(eta, it->second.radiation);
+      rComponents[it->first]->Fill(costheta, it->second.radiation);
       if (iComponents[it->first]==NULL) {
         iComponents[it->first] = new TH1D();
         iComponents[it->first]->SetBins(nTracks, 0.0, getEtaMaxMaterial()); 
       }
-      iComponents[it->first]->Fill(eta, it->second.interaction);
+      iComponents[it->first]->Fill(costheta, it->second.interaction);
     }
 
 
@@ -996,28 +996,28 @@ void Analyzer::analyzeMaterialBudget(MaterialBudget& mb, const std::vector<doubl
 
     //      services, barrel
     tmp = analyzeInactiveSurfaces(mb.getInactiveSurfaces().getBarrelServices(), track, sumServicesComponentsRI, MaterialProperties::no_cat);
-    rserfbarrel.Fill(eta, tmp.radiation);
-    iserfbarrel.Fill(eta, tmp.interaction);
-    rbarrelall.Fill(eta, tmp.radiation);
-    ibarrelall.Fill(eta, tmp.interaction);
-    rserfall.Fill(eta, tmp.radiation);
-    iserfall.Fill(eta, tmp.interaction);
-    rglobal.Fill(eta, tmp.radiation);
-    iglobal.Fill(eta, tmp.interaction);
-    rComponents["Services"]->Fill(eta, tmp.radiation);
-    iComponents["Services"]->Fill(eta, tmp.interaction);
+    rserfbarrel.Fill(costheta, tmp.radiation);
+    iserfbarrel.Fill(costheta, tmp.interaction);
+    rbarrelall.Fill(costheta, tmp.radiation);
+    ibarrelall.Fill(costheta, tmp.interaction);
+    rserfall.Fill(costheta, tmp.radiation);
+    iserfall.Fill(costheta, tmp.interaction);
+    rglobal.Fill(costheta, tmp.radiation);
+    iglobal.Fill(costheta, tmp.interaction);
+    rComponents["Services"]->Fill(costheta, tmp.radiation);
+    iComponents["Services"]->Fill(costheta, tmp.interaction);
     //      services, endcap
     tmp = analyzeInactiveSurfaces(mb.getInactiveSurfaces().getEndcapServices(), track, sumServicesComponentsRI, MaterialProperties::no_cat);
-    rserfendcap.Fill(eta, tmp.radiation);
-    iserfendcap.Fill(eta, tmp.interaction);
-    rendcapall.Fill(eta, tmp.radiation);
-    iendcapall.Fill(eta, tmp.interaction);
-    rserfall.Fill(eta, tmp.radiation);
-    iserfall.Fill(eta, tmp.interaction);
-    rglobal.Fill(eta, tmp.radiation);
-    iglobal.Fill(eta, tmp.interaction);
-    rComponents["Services"]->Fill(eta, tmp.radiation);
-    iComponents["Services"]->Fill(eta, tmp.interaction);
+    rserfendcap.Fill(costheta, tmp.radiation);
+    iserfendcap.Fill(costheta, tmp.interaction);
+    rendcapall.Fill(costheta, tmp.radiation);
+    iendcapall.Fill(costheta, tmp.interaction);
+    rserfall.Fill(costheta, tmp.radiation);
+    iserfall.Fill(costheta, tmp.interaction);
+    rglobal.Fill(costheta, tmp.radiation);
+    iglobal.Fill(costheta, tmp.interaction);
+    rComponents["Services"]->Fill(costheta, tmp.radiation);
+    iComponents["Services"]->Fill(costheta, tmp.interaction);
 
 
     /*for (std::map<std::string, Material>::iterator it = sumServicesComponentsRI.begin(); it != sumServicesComponentsRI.end(); ++it) {
@@ -1037,58 +1037,58 @@ void Analyzer::analyzeMaterialBudget(MaterialBudget& mb, const std::vector<doubl
 
     //      supports, barrel
     tmp = analyzeInactiveSurfaces(mb.getInactiveSurfaces().getSupports(), track, sumServicesComponentsRI, MaterialProperties::b_sup);
-    rlazybarrel.Fill(eta, tmp.radiation);
-    ilazybarrel.Fill(eta, tmp.interaction);
-    rbarrelall.Fill(eta, tmp.radiation);
-    ibarrelall.Fill(eta, tmp.interaction);
-    rlazyall.Fill(eta, tmp.radiation);
-    ilazyall.Fill(eta, tmp.interaction);
-    rglobal.Fill(eta, tmp.radiation);
-    iglobal.Fill(eta, tmp.interaction);
-    rComponents["Supports"]->Fill(eta, tmp.radiation);
-    iComponents["Supports"]->Fill(eta, tmp.interaction);
+    rlazybarrel.Fill(costheta, tmp.radiation);
+    ilazybarrel.Fill(costheta, tmp.interaction);
+    rbarrelall.Fill(costheta, tmp.radiation);
+    ibarrelall.Fill(costheta, tmp.interaction);
+    rlazyall.Fill(costheta, tmp.radiation);
+    ilazyall.Fill(costheta, tmp.interaction);
+    rglobal.Fill(costheta, tmp.radiation);
+    iglobal.Fill(costheta, tmp.interaction);
+    rComponents["Supports"]->Fill(costheta, tmp.radiation);
+    iComponents["Supports"]->Fill(costheta, tmp.interaction);
     //      supports, endcap
     tmp = analyzeInactiveSurfaces(mb.getInactiveSurfaces().getSupports(), track, sumServicesComponentsRI, MaterialProperties::e_sup);
-    rlazyendcap.Fill(eta, tmp.radiation);
-    ilazyendcap.Fill(eta, tmp.interaction);
-    rendcapall.Fill(eta, tmp.radiation);
-    iendcapall.Fill(eta, tmp.interaction);
-    rlazyall.Fill(eta, tmp.radiation);
-    ilazyall.Fill(eta, tmp.interaction);
-    rglobal.Fill(eta, tmp.radiation);
-    iglobal.Fill(eta, tmp.interaction);
-    rComponents["Supports"]->Fill(eta, tmp.radiation);
-    iComponents["Supports"]->Fill(eta, tmp.interaction);
+    rlazyendcap.Fill(costheta, tmp.radiation);
+    ilazyendcap.Fill(costheta, tmp.interaction);
+    rendcapall.Fill(costheta, tmp.radiation);
+    iendcapall.Fill(costheta, tmp.interaction);
+    rlazyall.Fill(costheta, tmp.radiation);
+    ilazyall.Fill(costheta, tmp.interaction);
+    rglobal.Fill(costheta, tmp.radiation);
+    iglobal.Fill(costheta, tmp.interaction);
+    rComponents["Supports"]->Fill(costheta, tmp.radiation);
+    iComponents["Supports"]->Fill(costheta, tmp.interaction);
     //      supports, tubes
     tmp = analyzeInactiveSurfaces(mb.getInactiveSurfaces().getSupports(), track, sumServicesComponentsRI, MaterialProperties::o_sup);
-    rlazytube.Fill(eta, tmp.radiation);
-    ilazytube.Fill(eta, tmp.interaction);
-    rlazyall.Fill(eta, tmp.radiation);
-    ilazyall.Fill(eta, tmp.interaction);
-    rglobal.Fill(eta, tmp.radiation);
-    iglobal.Fill(eta, tmp.interaction);
-    rComponents["Supports"]->Fill(eta, tmp.radiation);
-    iComponents["Supports"]->Fill(eta, tmp.interaction);
+    rlazytube.Fill(costheta, tmp.radiation);
+    ilazytube.Fill(costheta, tmp.interaction);
+    rlazyall.Fill(costheta, tmp.radiation);
+    ilazyall.Fill(costheta, tmp.interaction);
+    rglobal.Fill(costheta, tmp.radiation);
+    iglobal.Fill(costheta, tmp.interaction);
+    rComponents["Supports"]->Fill(costheta, tmp.radiation);
+    iComponents["Supports"]->Fill(costheta, tmp.interaction);
     //      supports, barrel tubes
     tmp = analyzeInactiveSurfaces(mb.getInactiveSurfaces().getSupports(), track, sumServicesComponentsRI, MaterialProperties::t_sup);
-    rlazybtube.Fill(eta, tmp.radiation);
-    ilazybtube.Fill(eta, tmp.interaction);
-    rlazyall.Fill(eta, tmp.radiation);
-    ilazyall.Fill(eta, tmp.interaction);
-    rglobal.Fill(eta, tmp.radiation);
-    iglobal.Fill(eta, tmp.interaction);
-    rComponents["Supports"]->Fill(eta, tmp.radiation);
-    iComponents["Supports"]->Fill(eta, tmp.interaction);
+    rlazybtube.Fill(costheta, tmp.radiation);
+    ilazybtube.Fill(costheta, tmp.interaction);
+    rlazyall.Fill(costheta, tmp.radiation);
+    ilazyall.Fill(costheta, tmp.interaction);
+    rglobal.Fill(costheta, tmp.radiation);
+    iglobal.Fill(costheta, tmp.interaction);
+    rComponents["Supports"]->Fill(costheta, tmp.radiation);
+    iComponents["Supports"]->Fill(costheta, tmp.interaction);
     //      supports, user defined
     tmp = analyzeInactiveSurfaces(mb.getInactiveSurfaces().getSupports(), track, sumServicesComponentsRI, MaterialProperties::u_sup);
-    rlazyuserdef.Fill(eta, tmp.radiation);
-    ilazyuserdef.Fill(eta, tmp.interaction);
-    rlazyall.Fill(eta, tmp.radiation);
-    ilazyall.Fill(eta, tmp.interaction);
-    rglobal.Fill(eta, tmp.radiation);
-    iglobal.Fill(eta, tmp.interaction);
-    rComponents["Supports"]->Fill(eta, tmp.radiation);
-    iComponents["Supports"]->Fill(eta, tmp.interaction);
+    rlazyuserdef.Fill(costheta, tmp.radiation);
+    ilazyuserdef.Fill(costheta, tmp.interaction);
+    rlazyall.Fill(costheta, tmp.radiation);
+    ilazyall.Fill(costheta, tmp.interaction);
+    rglobal.Fill(costheta, tmp.radiation);
+    iglobal.Fill(costheta, tmp.interaction);
+    rComponents["Supports"]->Fill(costheta, tmp.radiation);
+    iComponents["Supports"]->Fill(costheta, tmp.interaction);
     //      pixels, if they exist
     std::map<std::string, Material> ignoredPixelSumComponentsRI;
     std::map<std::string, Material> ignoredPixelSumServicesComponentsRI;
@@ -1122,7 +1122,7 @@ void Analyzer::analyzeMaterialBudget(MaterialBudget& mb, const std::vector<doubl
       int nActiveHits = track.getNActiveHits(trackingTag);
       if (nActiveHits>0) {
         hadronTotalHitsGraph.SetPoint(hadronTotalHitsGraph.GetN(),
-                                      eta,
+                                      costheta,
                                       nActiveHits);
         double probability;
         std::vector<double> probabilities = track.getHadronActiveHitsProbability(trackingTag);
@@ -1145,7 +1145,7 @@ void Analyzer::analyzeMaterialBudget(MaterialBudget& mb, const std::vector<doubl
           moreThanProb+=exactProb;
         }
         hadronAverageHitsGraph.SetPoint(hadronAverageHitsGraph.GetN(),
-                                        eta,
+                                        costheta,
                                         averageHits);
         //hadronAverageHitsGraph.SetPointError(hadronAverageHitsGraph.GetN()-1,
         //                       0,
@@ -1170,23 +1170,23 @@ void Analyzer::analyzeMaterialBudget(MaterialBudget& mb, const std::vector<doubl
           // std::cerr << "      PROBABILITY = " << probability << endl << endl;
           //}
           hadronGoodTracksFraction.at(i).SetPoint(hadronGoodTracksFraction.at(i).GetN(),
-                                                  eta,
+                                                  costheta,
                                                   probability);
         }
       }
     }
 
 
-    double etaMax = getEtaMaxMaterial();
+    double costhetaMax = getEtaMaxMaterial();
 
-    if (eta >= 0.) {
+    if (costheta >= 0.) {
 
       // EXTRA PLOTS: SERVICES DETAILS (FULL VOLUMES)
       for (std::vector<std::unique_ptr<Hit>>::const_iterator itHit=track.getBeginHits(); itHit!=track.getEndHits(); itHit++) {
         auto& hit = *itHit;
 	if (!hit->isPixel() && hit->isService()) {
 	  fillRIServicesDetailsHistos(rComponentsServicesDetails, iComponentsServicesDetails,
-				      hit, eta, theta, nTracks, etaMax);
+				      hit, costheta, theta, nTracks, costhetaMax);
 	}
       }
 
@@ -1204,7 +1204,7 @@ void Analyzer::analyzeMaterialBudget(MaterialBudget& mb, const std::vector<doubl
     }
 
 
-  } // loop on eta
+  } // loop on costheta
 
 
 
@@ -1968,47 +1968,47 @@ void Analyzer::calculateGraphsConstPt(const int& parameter,
   TGraph& thisOmegaGraph_Pt     = graphTag.empty() ? myGraphBag.getGraph(graphAttributes | GraphBag::OmegaGraph_Pt   , parameter ) : myGraphBag.getTaggedGraph(graphAttributes | GraphBag::OmegaGraph_Pt     , graphTag, parameter);
 
   // Variables
-  double eta;
+  double costheta;
   std::ostringstream aName;
 
-  // Prepare plot for const pt across eta
+  // Prepare plot for const pt across costheta
   double momentum = double(parameter)*Units::MeV/Units::GeV;
 
   // Prepare plots: pt
-  thisRhoGraph_Pt.SetTitle("p_{T} resolution versus #eta - const P_{T} across #eta;#eta;#delta p_{T}/p_{T} [%]");
-  aName.str(""); aName << "pt_vs_eta" << momentum << graphTag;
+  thisRhoGraph_Pt.SetTitle("p_{T} resolution versus cos#theta - const P_{T} across cos#theta;cos#theta;#delta p_{T}/p_{T} [%]");
+  aName.str(""); aName << "pt_vs_costheta" << momentum << graphTag;
   thisRhoGraph_Pt.SetName(aName.str().c_str());
   // Prepare plots: phi
-  thisPhiGraph_Pt.SetTitle("Track azimuthal angle error - const P_{T} across #eta;#eta;#delta #phi [deg]");
-  aName.str(""); aName << "phi_vs_eta" << momentum << graphTag;
+  thisPhiGraph_Pt.SetTitle("Track azimuthal angle error - const P_{T} across cos#theta;cos#theta;#delta #phi [deg]");
+  aName.str(""); aName << "phi_vs_costheta" << momentum << graphTag;
   thisPhiGraph_Pt.SetName(aName.str().c_str());
   // Prepare plots: d
-  thisDGraph_Pt.SetTitle("Transverse impact parameter error - const P_{T} across #eta;#eta;#delta d_{0} [#mum]");
-  aName.str(""); aName << "d_vs_eta" << momentum << graphTag;
+  thisDGraph_Pt.SetTitle("Transverse impact parameter error - const P_{T} across cos#theta;cos#theta;#delta d_{0} [#mum]");
+  aName.str(""); aName << "d_vs_costheta" << momentum << graphTag;
   thisDGraph_Pt.SetName(aName.str().c_str());
   // Prepare plots: ctg(theta)
-  thisCtgThetaGraph_Pt.SetTitle("Track polar angle error - const P_{T} across #eta;#eta;#delta ctg(#theta)");
-  aName.str(""); aName << "ctgTheta_vs_eta" << momentum << graphTag;
+  thisCtgThetaGraph_Pt.SetTitle("Track polar angle error - const P_{T} across cos#theta;cos#theta;#delta ctg(#theta)");
+  aName.str(""); aName << "ctgTheta_vs_costheta" << momentum << graphTag;
   thisCtgThetaGraph_Pt.SetName(aName.str().c_str());
   // Prepare plots: z0
-  thisZ0Graph_Pt.SetTitle("Longitudinal impact parameter error - const P_{T} across #eta;#eta;#delta z_{0} [#mum]");
-  aName.str(""); aName << "z_vs_eta" << momentum << graphTag;
+  thisZ0Graph_Pt.SetTitle("Longitudinal impact parameter error - const P_{T} across cos#theta;cos#theta;#delta z_{0} [#mum]");
+  aName.str(""); aName << "z_vs_costheta" << momentum << graphTag;
   thisZ0Graph_Pt.SetName(aName.str().c_str());
   // Prepare plots: p
-  thisPGraph_Pt.SetTitle("p resolution versus #eta - const P_{T} across #eta;#eta;#delta p/p [%]");
-  aName.str(""); aName << "p_vs_eta" << momentum << graphTag;
+  thisPGraph_Pt.SetTitle("p resolution versus cos#theta - const P_{T} across cos#theta;cos#theta;#delta p/p [%]");
+  aName.str(""); aName << "p_vs_costheta" << momentum << graphTag;
   thisPGraph_Pt.SetName(aName.str().c_str());
   // Prepare plots: L
-  thisLGraph_Pt.SetTitle("c#tau resolution versus #eta - const P_{T} across #eta;#eta;#delta c#tau [#mum]");
-  aName.str(""); aName << "l_vs_eta" << momentum << graphTag;
+  thisLGraph_Pt.SetTitle("c#tau resolution versus cos#theta - const P_{T} across cos#theta;cos#theta;#delta c#tau [#mum]");
+  aName.str(""); aName << "l_vs_costheta" << momentum << graphTag;
   thisLGraph_Pt.SetName(aName.str().c_str());
   // Prepare plots: Beta
-  thisBetaGraph_Pt.SetTitle("#beta - const P_{T} across #eta;#eta;#beta [rad]");
-  aName.str(""); aName << "beta_vs_eta" << momentum << graphTag;
+  thisBetaGraph_Pt.SetTitle("#beta - const P_{T} across cos#theta;cos#theta;#beta [rad]");
+  aName.str(""); aName << "beta_vs_costheta" << momentum << graphTag;
   thisBetaGraph_Pt.SetName(aName.str().c_str());
   // Prepare plots: Omega
-  thisOmegaGraph_Pt.SetTitle("#omega - const P_{T} across #eta;#eta;#omega [rad]");
-  aName.str(""); aName << "omega_vs_eta" << momentum << graphTag;
+  thisOmegaGraph_Pt.SetTitle("#omega - const P_{T} across cos#theta;cos#theta;#omega [rad]");
+  aName.str(""); aName << "omega_vs_costheta" << momentum << graphTag;
   thisOmegaGraph_Pt.SetName(aName.str().c_str());
 
   // track loop
@@ -2039,51 +2039,51 @@ void Analyzer::calculateGraphsConstPt(const int& parameter,
 //    }
 
 
-    eta = myTrack->getEta();
     double theta = myTrack->getTheta();
+    costheta = cos(theta);
     if (dpt>0) {
       // deltaRho / rho = deltaRho * R
       graphValue = dpt*100; // in percent
-      thisRhoGraph_Pt.SetPoint(thisRhoGraph_Pt.GetN(), eta, graphValue);
+      thisRhoGraph_Pt.SetPoint(thisRhoGraph_Pt.GetN(), costheta, graphValue);
     }
     if (dphi0>0) {
       graphValue = dphi0 / Units::deg; // in degrees
-      thisPhiGraph_Pt.SetPoint(thisPhiGraph_Pt.GetN(), eta, graphValue);
+      thisPhiGraph_Pt.SetPoint(thisPhiGraph_Pt.GetN(), costheta, graphValue);
     }
     if (dd0>0) {
       graphValue = dd0 / Units::um ; // in um
-      thisDGraph_Pt.SetPoint(thisDGraph_Pt.GetN(), eta, graphValue );
+      thisDGraph_Pt.SetPoint(thisDGraph_Pt.GetN(), costheta, graphValue );
     }
     if (dctg>0) {
       graphValue = dctg; // An absolute number
-      thisCtgThetaGraph_Pt.SetPoint(thisCtgThetaGraph_Pt.GetN(), eta, graphValue);
+      thisCtgThetaGraph_Pt.SetPoint(thisCtgThetaGraph_Pt.GetN(), costheta, graphValue);
     }
     if (dz0>0) {
       graphValue =  (dz0) / Units::um ; // in um
-      thisZ0Graph_Pt.SetPoint(thisZ0Graph_Pt.GetN(), eta, graphValue);
+      thisZ0Graph_Pt.SetPoint(thisZ0Graph_Pt.GetN(), costheta, graphValue);
     }
     if ((dp>0)||true) {
       graphValue = dp * 100.; // in percent
-      thisPGraph_Pt.SetPoint(thisPGraph_Pt.GetN(), eta, graphValue);
+      thisPGraph_Pt.SetPoint(thisPGraph_Pt.GetN(), costheta, graphValue);
     }
     if ((dd0>0)&&(dz0>0)) {
       double resolution = (cos(theta)*cos(theta)+1)/dd0/dd0 + sin(theta)*sin(theta)/dz0/dz0;
       resolution = sqrt(2/resolution) / Units::um ; // resolution in um
-      thisLGraph_Pt.SetPoint(thisLGraph_Pt.GetN(), eta, resolution);
+      thisLGraph_Pt.SetPoint(thisLGraph_Pt.GetN(), costheta, resolution);
 
       double beta = (cos(theta)*cos(theta)+1)*dz0*dz0*dz0/(sin(theta)*sin(theta)*dd0*dd0*dd0);
       beta = atan(beta);
-      thisBetaGraph_Pt.SetPoint(thisBetaGraph_Pt.GetN(), eta, beta);
+      thisBetaGraph_Pt.SetPoint(thisBetaGraph_Pt.GetN(), costheta, beta);
 
       double omega = ((cos(theta)*cos(theta)+1)-sin(theta)*sin(theta)*dz0*dz0/dd0/dd0)/dz0/dd0;
       omega = atan(omega);
-      thisOmegaGraph_Pt.SetPoint(thisOmegaGraph_Pt.GetN(), eta, omega);
+      thisOmegaGraph_Pt.SetPoint(thisOmegaGraph_Pt.GetN(), costheta, omega);
     }
   }
 }
 
 /**
- * Calculate the error graphs for case II with const P across eta: the radius curvature, the distance and the angle, for each momentum,
+ * Calculate the error graphs for case II with const P across costheta: the radius curvature, the distance and the angle, for each momentum,
  * and store them internally for later visualisation.
  * @param parameter The list of different momenta that the error graphs are calculated for
  */
@@ -2104,47 +2104,47 @@ void Analyzer::calculateGraphsConstP(const int& parameter,
   TGraph& thisOmegaGraph_P     = graphTag.empty() ? myGraphBag.getGraph(graphAttributes | GraphBag::OmegaGraph_P   , parameter ) : myGraphBag.getTaggedGraph(graphAttributes | GraphBag::OmegaGraph_P     , graphTag, parameter);
 
   // Variables
-  double eta;
+  double costheta;
   std::ostringstream aName;
 
-  // Prepare plot for const pt across eta
+  // Prepare plot for const p across costheta
   double momentum = double(parameter)*Units::MeV/Units::GeV;
 
-  // Prepare plots: pt
-  thisRhoGraph_P.SetTitle("p_{T} resolution versus #eta - const P across #eta;#eta;#delta p_{T}/p_{T} [%]");
-  aName.str(""); aName << "pt_vs_eta" << momentum << graphTag;
+  // Prepare plots: p
+  thisRhoGraph_P.SetTitle("p_{T} resolution versus cos#theta - const P across cos#theta;cos#theta;#delta p_{T}/p_{T} [%]");
+  aName.str(""); aName << "pt_vs_costheta" << momentum << graphTag;
   thisRhoGraph_P.SetName(aName.str().c_str());
   // Prepare plots: phi
-  thisPhiGraph_P.SetTitle("Track azimuthal angle error - const P across #eta;#eta;#delta #phi [deg]");
-  aName.str(""); aName << "phi_vs_eta" << momentum << graphTag;
+  thisPhiGraph_P.SetTitle("Track azimuthal angle error - const P across cos#theta;cos#theta;#delta #phi [deg]");
+  aName.str(""); aName << "phi_vs_costheta" << momentum << graphTag;
   thisPhiGraph_P.SetName(aName.str().c_str());
   // Prepare plots: d
-  thisDGraph_P.SetTitle("Transverse impact parameter error - const P across #eta;#eta;#delta d_{0} [#mum]");
-  aName.str(""); aName << "d_vs_eta" << momentum << graphTag;
+  thisDGraph_P.SetTitle("Transverse impact parameter error - const P across cos#theta;cos#theta;#delta d_{0} [#mum]");
+  aName.str(""); aName << "d_vs_costheta" << momentum << graphTag;
   thisDGraph_P.SetName(aName.str().c_str());
   // Prepare plots: ctg(theta)
-  thisCtgThetaGraph_P.SetTitle("Track polar angle error - const P across #eta;#eta;#delta ctg(#theta)");
-  aName.str(""); aName << "ctgTheta_vs_eta" << momentum << graphTag;
+  thisCtgThetaGraph_P.SetTitle("Track polar angle error - const P across cos#theta;cos#theta;#delta ctg(#theta)");
+  aName.str(""); aName << "ctgTheta_vs_costheta" << momentum << graphTag;
   thisCtgThetaGraph_P.SetName(aName.str().c_str());
   // Prepare plots: z0
-  thisZ0Graph_P.SetTitle("Longitudinal impact parameter error - const P across #eta;#eta;#delta z_{0} [#mum]");
-  aName.str(""); aName << "z_vs_eta" << momentum << graphTag;
+  thisZ0Graph_P.SetTitle("Longitudinal impact parameter error - const P across cos#theta;cos#theta;#delta z_{0} [#mum]");
+  aName.str(""); aName << "z_vs_costheta" << momentum << graphTag;
   thisZ0Graph_P.SetName(aName.str().c_str());
   // Prepare plots: p
-  thisPGraph_P.SetTitle("p resolution versus #eta - const P across #eta;#eta;#delta p/p [%]");
-  aName.str(""); aName << "p_vs_eta" << momentum << graphTag;
+  thisPGraph_P.SetTitle("p resolution versus cos#theta - const P across cos#theta;cos#theta;#delta p/p [%]");
+  aName.str(""); aName << "p_vs_costheta" << momentum << graphTag;
   thisPGraph_P.SetName(aName.str().c_str());
   // Prepare plots: L
-  thisLGraph_P.SetTitle("c#tau resolution versus #eta - const P across #eta;#eta;#delta c#tau [#mum]");
-  aName.str(""); aName << "l_vs_eta" << momentum << graphTag;
+  thisLGraph_P.SetTitle("c#tau resolution versus cos#theta - const P across cos#theta;cos#theta;#delta c#tau [#mum]");
+  aName.str(""); aName << "l_vs_costheta" << momentum << graphTag;
   thisLGraph_P.SetName(aName.str().c_str());
   // Prepare plots: Beta
-  thisBetaGraph_P.SetTitle("#beta - const P across #eta;#eta;#beta [rad]");
-  aName.str(""); aName << "beta_vs_eta" << momentum << graphTag;
+  thisBetaGraph_P.SetTitle("#beta - const P across cos#theta;cos#theta;#beta [rad]");
+  aName.str(""); aName << "beta_vs_costheta" << momentum << graphTag;
   thisBetaGraph_P.SetName(aName.str().c_str());
   // Prepare plots: Omega
-  thisOmegaGraph_P.SetTitle("#omega - const P across #eta;#eta;#omega [rad]");
-  aName.str(""); aName << "omega_vs_eta" << momentum << graphTag;
+  thisOmegaGraph_P.SetTitle("#omega - const P across cos#theta;cos#theta;#omega [rad]");
+  aName.str(""); aName << "omega_vs_costheta" << momentum << graphTag;
   thisOmegaGraph_P.SetName(aName.str().c_str());
 
   // track loop
@@ -2158,45 +2158,45 @@ void Analyzer::calculateGraphsConstP(const int& parameter,
     const double& dz0  = myTrack->getDeltaZ0();
     const double& dp   = myTrack->getDeltaPOverP(rPos);
 
-    eta = myTrack->getEta();
     double theta = myTrack->getTheta();
+    costheta = cos(theta);
     if (dpt>0) {
-      // deltaRho / rho = deltaRho * R
+      // deltaRho / rho = deltaRho * R //
       graphValue = dpt* 100; // in percent
-      thisRhoGraph_P.SetPoint(thisRhoGraph_P.GetN(), eta, graphValue);
+      thisRhoGraph_P.SetPoint(thisRhoGraph_P.GetN(), costheta, graphValue);
     }
     if (dphi0>0) {
       graphValue = dphi0/Units::deg; // in degrees
-      thisPhiGraph_P.SetPoint(thisPhiGraph_P.GetN(), eta, graphValue);
+      thisPhiGraph_P.SetPoint(thisPhiGraph_P.GetN(), costheta, graphValue);
     }
     if (dd0>0) {
       graphValue = dd0 / Units::um;
-      thisDGraph_P.SetPoint(thisDGraph_P.GetN(), eta, graphValue );
+      thisDGraph_P.SetPoint(thisDGraph_P.GetN(), costheta, graphValue );
     }
     if (dctg>0) {
       graphValue = dctg; // An absolute number
-      thisCtgThetaGraph_P.SetPoint(thisCtgThetaGraph_P.GetN(), eta, graphValue);
+      thisCtgThetaGraph_P.SetPoint(thisCtgThetaGraph_P.GetN(), costheta, graphValue);
     }
     if (dz0>0) {
       graphValue =  (dz0) / Units::um;
-      thisZ0Graph_P.SetPoint(thisZ0Graph_P.GetN(), eta, graphValue);
+      thisZ0Graph_P.SetPoint(thisZ0Graph_P.GetN(), costheta, graphValue);
     }
     if ((dp>0)||true) {
       graphValue = dp * 100.; // in percent
-      thisPGraph_P.SetPoint(thisPGraph_P.GetN(), eta, graphValue);
+      thisPGraph_P.SetPoint(thisPGraph_P.GetN(), costheta, graphValue);
     }
     if ((dd0>0)&&(dz0>0)) {
       double resolution = (cos(theta)*cos(theta)+1)/dd0/dd0 + sin(theta)*sin(theta)/dz0/dz0;
       resolution = sqrt(2/resolution) / Units::um ; // resolution in um
-      thisLGraph_P.SetPoint(thisLGraph_P.GetN(), eta, resolution);
+      thisLGraph_P.SetPoint(thisLGraph_P.GetN(), costheta, resolution);
 
       double beta = (cos(theta)*cos(theta)+1)*dz0*dz0*dz0/(sin(theta)*sin(theta)*dd0*dd0*dd0);
       beta = atan(beta);
-      thisBetaGraph_P.SetPoint(thisBetaGraph_P.GetN(), eta, beta);
+      thisBetaGraph_P.SetPoint(thisBetaGraph_P.GetN(), costheta, beta);
 
       double omega = ((cos(theta)*cos(theta)+1)-sin(theta)*sin(theta)*dz0*dz0/dd0/dd0)/dz0/dd0;
       omega = atan(omega);
-      thisOmegaGraph_P.SetPoint(thisOmegaGraph_P.GetN(), eta, omega);
+      thisOmegaGraph_P.SetPoint(thisOmegaGraph_P.GetN(), costheta, omega);
     }
 
   }
@@ -2852,18 +2852,20 @@ void Analyzer::setHistogramBinsBoundaries(int bins, double min, double max) {
  * @param bins The number of bins in eta; the number of bins in r will be half that
  * @param minr The minimum radius that will be considered for tracking
  * @param maxr The maximum radius that will be considered for tracking
- * @param mineta The minimum value of eta that will be considered for tracking
- * @param maxeta The maximum value of eta that will be considered for tracking
+ * @param mincostheta The minimum value of costheta that will be considered for tracking
+ * @param maxcostheta The maximum value of costheta that will be considered for tracking
  */
-void Analyzer::setCellBoundaries(int bins, double minr, double maxr, double mineta, double maxeta) {
-  double rstep, etastep;
+void Analyzer::setCellBoundaries(int bins, double minr, double maxr, double mincostheta, double maxcostheta) {
+  double rstep, costhetastep;
   rstep = 2 * (maxr - minr) / bins;
-  etastep = (maxeta - mineta) / bins;
+  costhetastep = (maxcostheta - mincostheta) / bins;
   Cell c;
   c.rmin = 0.0;  // TODO: is this right?
   c.rmax = 0.0;
   c.etamin = 0.0;
   c.etamax = 0.0;
+  c.costhetamin = 0.0;
+  c.costhetamax = 0.0;
   c.rlength = 0.0;
   c.ilength = 0.0;
   cells.resize(bins);
@@ -2872,8 +2874,8 @@ void Analyzer::setCellBoundaries(int bins, double minr, double maxr, double mine
     for (unsigned int j = 0; j < cells.at(i).size(); j++) {
       cells.at(i).at(j).rmin = minr + j * rstep;
       cells.at(i).at(j).rmax = minr + (j+1) * rstep;
-      cells.at(i).at(j).etamin = mineta + i * etastep;;
-      cells.at(i).at(j).etamax = mineta + (i+1) * etastep;
+      cells.at(i).at(j).costhetamin = mincostheta + i * costhetastep;;
+      cells.at(i).at(j).costhetamax = mincostheta + (i+1) * costhetastep;
     }
   }
 }
@@ -2955,27 +2957,28 @@ TH2D& Analyzer::getHistoMapInteraction() {
 
 /**
  * This function assigns the local radiation and interaction lengths of a detected hit to their position in the
- * (eta, r) space.
+ * (costheta, r) space.
  * @param r The radius at which the hit was detected
- * @param eta The eta value of the current track
+ * @param theta The theta value of the current track
  * @param rl The local radiation length
  * @param il The local interaction length
  */
 void Analyzer::fillCell(double r, double eta, double theta, Material mat) {
   double rl = mat.radiation;
   double il = mat.interaction;
-  int rindex, etaindex;
+  double costheta = cos(theta);
+  int rindex, costhetaindex;
   if (cells.size() > 0) {
     for (rindex = 0; (unsigned int) rindex < cells.at(0).size(); rindex++) {
       if ((cells.at(0).at(rindex).rmin <= r) && (cells.at(0).at(rindex).rmax > r)) break;
     }
     if ((unsigned int) rindex < cells.at(0).size()) {
-      for (etaindex = 0; (unsigned int) etaindex < cells.size(); etaindex++) {
-        if ((cells.at(etaindex).at(rindex).etamin <= eta) && (cells.at(etaindex).at(rindex).etamax > eta)) break;
+      for (costhetaindex = 0; (unsigned int) costhetaindex < cells.size(); costhetaindex++) {
+        if ((cells.at(costhetaindex).at(rindex).costhetamin <= costheta) && (cells.at(costhetaindex).at(rindex).costhetamax > costheta)) break;
       }
-      if ((unsigned int) etaindex < cells.size()) {
-        cells.at(etaindex).at(rindex).rlength = cells.at(etaindex).at(rindex).rlength + rl;
-        cells.at(etaindex).at(rindex).ilength = cells.at(etaindex).at(rindex).ilength + il;
+      if ((unsigned int) costhetaindex < cells.size()) {
+        cells.at(costhetaindex).at(rindex).rlength = cells.at(costhetaindex).at(rindex).rlength + rl;
+        cells.at(costhetaindex).at(rindex).ilength = cells.at(costhetaindex).at(rindex).ilength + il;
       }
     }
   }
@@ -3126,7 +3129,7 @@ void Analyzer::analyzeGeometry(Tracker& tracker, int nTracks /*=1000*/ ) {
   double randomSpan = (etaMinMax.second - etaMinMax.first)*(1. + randomPercentMargin);
   double randomBase = etaMinMax.first - (etaMinMax.second - etaMinMax.first)*(randomPercentMargin)/2.;
   double maxEta = etaMinMax.second *= (1 + randomPercentMargin);
-  /* std::cout << "maxEta= " << maxEta << endl; */
+  //std::cout << "maxEta= " << maxEta << endl;
   double max_costheta = TMath::Cos(2. * TMath::ATan(TMath::Exp(-1 * maxEta))); 
   //just for debug ----by ZengHao
   /* std::cout << endl; */
@@ -3889,9 +3892,9 @@ void Analyzer::createGeometryLite(Tracker& tracker) {
   /* Compute Tracking Volume Material Budget plots.
    */
   void Analyzer::computeTrackingVolumeMaterialBudget(const Track& track, const int nTracks, const std::map<std::string, Material>& innerTrackerModulesComponentsRI, const std::map<std::string, Material>& outerTrackerModulesComponentsRI) {
-    const double eta = track.getEta();
     const double theta = track.getTheta();
-    const double etaMax = getEtaMaxMaterial();
+    const double costheta = cos(theta);
+    const double costhetaMax = getEtaMaxMaterial();
 
     // BEAM PIPE MATERIAL BUDGET  
     // Material belonging to the Beam Pipe, and located before an active hit on the Tracker.
@@ -3901,8 +3904,8 @@ void Analyzer::createGeometryLite(Tracker& tracker) {
 	const Material& correctedMat = hit->getCorrectedMaterial();
 	fillRIComponentsHistos(rComponentsBeamPipe, iComponentsBeamPipe,
 			       beam_pipe, 
-			       correctedMat, eta, 
-			       nTracks, etaMax);
+			       correctedMat, costheta, 
+			       nTracks, costhetaMax);
       }
 
 
@@ -3912,8 +3915,8 @@ void Analyzer::createGeometryLite(Tracker& tracker) {
 	const Material& correctedMat = hit->getCorrectedMaterial();
 	fillRIComponentsHistos(rComponentsPixelInterstice, iComponentsPixelInterstice, 
 			       services_under_pixel_tracking_volume, 
-			       correctedMat, eta, 
-			       nTracks, etaMax);
+			       correctedMat, costheta, 
+			       nTracks, costhetaMax);
       }
     }
 
@@ -3927,8 +3930,8 @@ void Analyzer::createGeometryLite(Tracker& tracker) {
       const Material& correctedMat = it.second;
       fillRIComponentsHistos(rComponentsPixelTrackingVolume, iComponentsPixelTrackingVolume,
 			     componentName,
-			     correctedMat, eta, 
-			     nTracks, etaMax);
+			     correctedMat, costheta, 
+			     nTracks, costhetaMax);
     }
 
     for (std::vector<std::unique_ptr<Hit>>::const_iterator itHit=track.getBeginHits(); itHit!=track.getEndHits(); itHit++) {
@@ -3938,8 +3941,8 @@ void Analyzer::createGeometryLite(Tracker& tracker) {
 	const Material& correctedMat = hit->getCorrectedMaterial();
 	fillRIComponentsHistos(rComponentsPixelTrackingVolume, iComponentsPixelTrackingVolume,
 			       services_in_pixel_tracking_volume, 
-			       correctedMat, eta, 
-			       nTracks, etaMax);
+			       correctedMat, costheta, 
+			       nTracks, costhetaMax);
       }
 
       // C: supports
@@ -3947,8 +3950,8 @@ void Analyzer::createGeometryLite(Tracker& tracker) {
 	const Material& correctedMat = hit->getCorrectedMaterial();
 	fillRIComponentsHistos(rComponentsPixelTrackingVolume, iComponentsPixelTrackingVolume,
 			       supports_in_pixel_tracking_volume, 
-			       correctedMat, eta, 
-			       nTracks, etaMax);
+			       correctedMat, costheta, 
+			       nTracks, costhetaMax);
       }
 
 
@@ -3958,8 +3961,8 @@ void Analyzer::createGeometryLite(Tracker& tracker) {
 	const Material& correctedMat =  hit->getCorrectedMaterial();
 	fillRIComponentsHistos(rComponentsInterstice, iComponentsInterstice,
 			       services_and_supports_in_interstice,
-			       correctedMat, eta, 
-			       nTracks, etaMax);
+			       correctedMat, costheta, 
+			       nTracks, costhetaMax);
       }
     }
 
@@ -3973,8 +3976,8 @@ void Analyzer::createGeometryLite(Tracker& tracker) {
       const Material& correctedMat = it.second;
       fillRIComponentsHistos(rComponentsOuterTrackingVolume, iComponentsOuterTrackingVolume,
 			     componentName,
-			     correctedMat, eta, 
-			     nTracks, etaMax);
+			     correctedMat, costheta, 
+			     nTracks, costhetaMax);
     }
 
     for (std::vector<std::unique_ptr<Hit>>::const_iterator itHit=track.getBeginHits(); itHit!=track.getEndHits(); itHit++) {
@@ -3984,8 +3987,8 @@ void Analyzer::createGeometryLite(Tracker& tracker) {
 	const Material& correctedMat = hit->getCorrectedMaterial();
 	fillRIComponentsHistos(rComponentsOuterTrackingVolume, iComponentsOuterTrackingVolume,
 			       services_in_outer_tracking_volume,
-			       correctedMat, eta, 
-			       nTracks, etaMax);
+			       correctedMat, costheta, 
+			       nTracks, costhetaMax);
       }
 
       // F: supports
@@ -3993,8 +3996,8 @@ void Analyzer::createGeometryLite(Tracker& tracker) {
 	const Material& correctedMat = hit->getCorrectedMaterial();
 	fillRIComponentsHistos(rComponentsOuterTrackingVolume, iComponentsOuterTrackingVolume,
 			       supports_in_outer_tracking_volume,
-			       correctedMat, eta, 
-			       nTracks, etaMax);
+			       correctedMat, costheta, 
+			       nTracks, costhetaMax);
       }
     }
 
@@ -4006,14 +4009,14 @@ void Analyzer::createGeometryLite(Tracker& tracker) {
       if (hit->isPixelTrackingVolume() && hit->isService()) {
 
 	fillRIServicesDetailsHistos(rComponentsServicesDetailsPixelTrackingVolume, iComponentsServicesDetailsPixelTrackingVolume,
-				    hit, eta, theta, nTracks, etaMax);
+				    hit, costheta, theta, nTracks, costhetaMax);
       }	  
 
       // DETAILS OF SERVICES WITHIN OUTER TRACKER TRACKING VOLUME
       if (hit->isOuterTrackingVolume() && hit->isService()) {
 
 	fillRIServicesDetailsHistos(rComponentsServicesDetailsOuterTrackingVolume, iComponentsServicesDetailsOuterTrackingVolume,
-				    hit, eta, theta, nTracks, etaMax);
+				    hit, costheta, theta, nTracks, costhetaMax);
       }	 
     }
 
@@ -4027,7 +4030,7 @@ void Analyzer::createGeometryLite(Tracker& tracker) {
    * One needs to correct the MB, ie take into account the angle of the track crossing the volumes.
    * Then Analyzer::fillRIComponentsHistos is directly used.
    */
-  void Analyzer::fillRIServicesDetailsHistos(std::map<std::string, TH1D*>& rServicesDetails, std::map<std::string, TH1D*>& iServicesDetails, const std::unique_ptr<Hit>& hitOnService, const double eta, const double theta, const int nTracks, const double etaMax) const {
+  void Analyzer::fillRIServicesDetailsHistos(std::map<std::string, TH1D*>& rServicesDetails, std::map<std::string, TH1D*>& iServicesDetails, const std::unique_ptr<Hit>& hitOnService, const double costheta, const double theta, const int nTracks, const double costhetaMax) const {
 
     const InactiveElement* inactive = hitOnService->getHitPassiveElement();
     if (inactive != nullptr) {
@@ -4041,8 +4044,8 @@ void Analyzer::createGeometryLite(Tracker& tracker) {
 
 	fillRIComponentsHistos(rServicesDetails, iServicesDetails,
 			       componentName,
-			       correctedMat, eta, 
-			       nTracks, etaMax);
+			       correctedMat, costheta, 
+			       nTracks, costhetaMax);
       }
     }
     else logERROR("Analyzer::fillRIServicesDetailsHistos : Tries to access MB from a nullptr! ");
@@ -4053,7 +4056,7 @@ void Analyzer::createGeometryLite(Tracker& tracker) {
   /* Fill histograms with corrected Material Budget: left pad for Radiation Length, right pad for Interaction Length.
    * The MB is split by component category.
    */
-  void Analyzer::fillRIComponentsHistos(std::map<std::string, TH1D*>& rComponentsHistos, std::map<std::string, TH1D*>& iComponentsHistos, const std::string componentName, const Material& correctedMat, const double eta, const int nTracks, const double etaMax) const {
+  void Analyzer::fillRIComponentsHistos(std::map<std::string, TH1D*>& rComponentsHistos, std::map<std::string, TH1D*>& iComponentsHistos, const std::string componentName, const Material& correctedMat, const double costheta, const int nTracks, const double costhetaMax) const {
 
     // RADIATION LENGTH HISTOGRAM
     auto& rComponentsHisto = rComponentsHistos[componentName];
@@ -4061,10 +4064,10 @@ void Analyzer::createGeometryLite(Tracker& tracker) {
     // If histo does not exist yet, create it!
     if (rComponentsHisto == nullptr) {
       rComponentsHisto = new TH1D();
-      rComponentsHisto->SetBins(nTracks, 0.0, etaMax); 
+      rComponentsHisto->SetBins(nTracks, 0.0, costhetaMax); 
     }
     // Fill!
-    rComponentsHisto->Fill(eta, correctedMat.radiation);
+    rComponentsHisto->Fill(costheta, correctedMat.radiation);
 
 
     // INTERACTION LENGTH HISTOGRAM
@@ -4073,10 +4076,10 @@ void Analyzer::createGeometryLite(Tracker& tracker) {
     // If histo does not exist yet, create it!
     if (iComponentsHisto == nullptr) {
       iComponentsHisto = new TH1D();
-      iComponentsHisto->SetBins(nTracks, 0.0, etaMax);
+      iComponentsHisto->SetBins(nTracks, 0.0, costhetaMax);
     }
     // Fill!
-    iComponentsHisto->Fill(eta, correctedMat.interaction);
+    iComponentsHisto->Fill(costheta, correctedMat.interaction);
   }
 
 

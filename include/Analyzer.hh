@@ -330,8 +330,10 @@ namespace insur {
      * @param rmax The maximal radius value of the cell
      * @param etamin The minimal eta value of the cell
      * @param etamax The maximal eta value of the cell
+     * @param costhetamin The minimal costheta value of the cell
+     * @param costhetamax The maximal costheta value of the cell
      */
-    struct Cell { double rlength; double ilength; double rmin; double rmax; double etamin; double etamax; };
+    struct Cell { double rlength; double ilength; double rmin; double rmax; double etamin; double etamax; double costhetamin; double costhetamax;};
     std::vector<std::vector<Cell> > cells;
     TH1D ractivebarrel, ractiveendcap, rserfbarrel, rserfendcap, rlazybarrel, rlazyendcap, rlazybtube, rlazytube, rlazyuserdef;
     TH1D iactivebarrel, iactiveendcap, iserfbarrel, iserfendcap, ilazybarrel, ilazyendcap, ilazybtube, ilazytube, ilazyuserdef;

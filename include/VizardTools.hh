@@ -72,6 +72,7 @@ static const std::string emphEnd    = "</b>";
 static const std::string muLetter   = "&mu;";
 static const std::string sigmaLetter= "&sigma;";
 static const std::string etaLetter  = "&eta;";
+static const std::string costhetaLetter  = "cos&theta;";
 static const std::string phiLetter  = "&phi;";
 static const std::string thetaLetter= "&theta;";
 static const std::string deltaLetter= "&delta;";

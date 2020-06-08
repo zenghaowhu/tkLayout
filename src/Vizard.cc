@@ -573,7 +573,7 @@ namespace insur {
     cr = (TH1D*)a.getHistoGlobalR().Clone();
     crProf = newProfile(cr, 0., a.getEtaMaxMaterial(), materialNBins);
     //crProf->Rebin(10);
-    crProf->SetTitle("Radiation Length Over Full Tracker Volume; #eta; x/X_{0}");
+    crProf->SetTitle("Radiation Length Over Full Tracker Volume; cos#theta; x/X_{0}");
     crProf->GetYaxis()->SetTitleOffset(1.3);
     crProf->SetFillColor(kGray + 2);
     crProf->SetLineColor(kBlue);
@@ -583,7 +583,7 @@ namespace insur {
     // Full volume ilength
     ci = (TH1D*)a.getHistoGlobalI().Clone();
     ciProf = newProfile(ci, 0., a.getEtaMaxMaterial(), materialNBins);
-    ciProf->SetTitle("Interaction Length Over Full Tracker Volume; #eta; #lambda/#lambda_{0}");
+    ciProf->SetTitle("Interaction Length Over Full Tracker Volume; cos#theta; #lambda/#lambda_{0}");
     ciProf->GetYaxis()->SetTitleOffset(1.3);
     ciProf->SetFillColor(kGray + 2);
     ciProf->SetLineColor(kBlue);
@@ -596,13 +596,13 @@ namespace insur {
     myTable = new RootWTable();
     std::ostringstream aStringStream;
     aStringStream.str("");
-    aStringStream << "Average radiation length in full volume (eta = [0, ";
+    aStringStream << "Average radiation length in full volume (cos&theta; = [0, ";
     aStringStream << std::dec << std::fixed
                 << std::setprecision(1) << a.getEtaMaxMaterial();
     aStringStream << "])";
     myTable->setContent(1, 1, aStringStream.str().c_str());
     aStringStream.str("");
-    aStringStream << "Average interaction length in full volume (eta = [0, ";
+    aStringStream << "Average interaction length in full volume (cos&theta; = [0, ";
     aStringStream << std::dec << std::fixed
       << std::setprecision(1) << a.getEtaMaxMaterial();
     aStringStream << "])";
@@ -658,7 +658,7 @@ namespace insur {
     myPad = myCanvas->GetPad(1);
     myPad->cd();
     // radiation length in tracking volume by active, serving or passive
-    THStack* rcontainer = new THStack("rstack", "Radiation Length by Category");
+    THStack* rcontainer = new THStack("rstack", "Radiation Length by Category;cos#theta; x/X_{0}");
     TProfile* surProf = newProfile((TH1D*)a.getHistoSupportsAllR().Clone(), 0., a.getEtaMaxMaterial(), materialNBins);
     sur = surProf->ProjectionX();
     sur->SetLineColor(kOrange + 4);
@@ -675,11 +675,11 @@ namespace insur {
     acr->SetFillColor(kRed);
     rcontainer->Add(acr);
     rcontainer->Draw("hist");
-    //rcontainer->GetXaxis()->SetTitle("#eta"); 
+    //rcontainer->GetXaxis()->SetTitle("cos#theta"); 
     //myCanvas->Modified();
 
     // interaction length in tracking volume by active, serving or passive
-    THStack* icontainer = new THStack("istack", "Interaction Length by Category");
+    THStack* icontainer = new THStack("istack", "Interaction Length by Category; cos#theta; #lambda/#lambda_{0}");
     myPad = myCanvas->GetPad(2);
     myPad->cd();
     TProfile* suiProf = newProfile((TH1D*)a.getHistoSupportsAllI().Clone(), 0., a.getEtaMaxMaterial(), materialNBins);
@@ -698,7 +698,7 @@ namespace insur {
     aci->SetFillColor(kRed - 3);
     icontainer->Add(aci);
     icontainer->Draw("hist");
-    //icontainer->GetXaxis()->SetTitle("#eta"); 
+    //icontainer->GetXaxis()->SetTitle("cos#theta"); 
     //myCanvas->Modified();
 
     // Write asl category plots to web page
@@ -708,7 +708,7 @@ namespace insur {
     myTable = new RootWTable();
     // Average values by active, service and passive
     char titleString[256];
-    sprintf(titleString, "Average (eta = [0, %.1f])", a.getEtaMaxMaterial());
+    sprintf(titleString, "Average (cos&theta; = [0, %.1f])", a.getEtaMaxMaterial());
     myTable->setContent(0, 0, titleString);
     myTable->setContent(1, 0, "modules");
     myTable->setContent(2, 0, "services");
@@ -731,14 +731,14 @@ namespace insur {
     myPage->addContent(myContent);
 
     myTable = new RootWTable();
-    sprintf(titleString, "Average (eta = [0, %.1f])", a.getEtaMaxMaterial());
+    sprintf(titleString, "Average (cos&theta; = [0, %.1f])", a.getEtaMaxMaterial());
     myTable->setContent(0, 0, titleString);
     myTable->setContent(0, 1, "Radiation length");
     myTable->setContent(0, 2, "Interaction length");
 
 
-    THStack* rCompStack = new THStack("rcompstack", "Radiation Length by Component");
-    THStack* iCompStack = new THStack("icompstack", "Interaction Length by Component");
+    THStack* rCompStack = new THStack("rcompstack", "Radiation Length by Component;cos#theta; x/X_{0}");
+    THStack* iCompStack = new THStack("icompstack", "Interaction Length by Component;cos#theta; #lambda/#lambda_{0}");
 
     TLegend* compLegend = new TLegend(0.1,0.6,0.35,0.9);
 
@@ -766,7 +766,7 @@ namespace insur {
       myTable->setContent(compIndex++, 1, averageHistogramValues(*histo, a.getEtaMaxMaterial()), 5);
     }
     rCompStack->Draw("hist");
-    //rCompStack->GetXaxis()->SetTitle("#eta"); 
+    //rCompStack->GetXaxis()->SetTitle("cos#theta"); 
     //myCanvas->Modified();
     compLegend->Draw();
 
@@ -784,14 +784,14 @@ namespace insur {
       myTable->setContent(compIndex++, 2, averageHistogramValues(*histo, a.getEtaMaxMaterial()), 5);
     }
     iCompStack->Draw("hist");
-    //iCompStack->GetXaxis()->SetTitle("#eta"); 
+    //iCompStack->GetXaxis()->SetTitle("cos#theta"); 
     //myCanvas->Modified();
     compLegend->Draw();
 
     myContent->addItem(myTable);
 
     myImage = new RootWImage(std::move(myCanvas), 2*vis_min_canvas_sizeX, vis_min_canvas_sizeY);
-    myImage->setComment("Material in full volume as a function of &eta; (excluding beam pipe and including services, supports and module material (split by component)");
+    myImage->setComment("Material in full volume as a function of cos&theta; (excluding beam pipe and including services, supports and module material (split by component)");
     myImage->setName("matComponentsFull");
     myContent->addItem(myImage);
 
@@ -802,13 +802,13 @@ namespace insur {
     myPage->addContent(myContent);
 
     myTable = new RootWTable();
-    sprintf(titleString, "Average (eta = [0, %.1f])", a.getEtaMaxMaterial());
+    sprintf(titleString, "Average (cos&theta; = [0, %.1f])", a.getEtaMaxMaterial());
     myTable->setContent(0, 0, titleString);
     myTable->setContent(0, 1, "Radiation length");
     myTable->setContent(0, 2, "Interaction length");
 
-    THStack* rServicesCompStack = new THStack("rservicescompstack", "Radiation Length by Component");
-    THStack* iServicesCompStack = new THStack("iservicescompstack", "Interaction Length by Component");
+    THStack* rServicesCompStack = new THStack("rservicescompstack", "Radiation Length by Component;cos#theta; x/X_{0}");
+    THStack* iServicesCompStack = new THStack("iservicescompstack", "Interaction Length by Component;cos#theta; #lambda/#lambda_{0}");
 
     TLegend* servicesCompLegend = new TLegend(0.1,0.6,0.35,0.9);
 
@@ -834,7 +834,7 @@ namespace insur {
       myTable->setContent(servicesCompIndex++, 1, averageHistogramValues(*histo, a.getEtaMaxMaterial()), 5);
     }
     rServicesCompStack->Draw("hist");  
-    //rServicesCompStack->GetXaxis()->SetTitle("#eta"); 
+    //rServicesCompStack->GetXaxis()->SetTitle("cos#theta"); 
     //myCanvas->Modified();
     servicesCompLegend->Draw();
 
@@ -852,13 +852,13 @@ namespace insur {
       myTable->setContent(servicesCompIndex++, 2, averageHistogramValues(*histo, a.getEtaMaxMaterial()), 5);
     }
     iServicesCompStack->Draw("hist");
-    //rServicesCompStack->GetXaxis()->SetTitle("#eta"); 
+    //rServicesCompStack->GetXaxis()->SetTitle("cos#theta"); 
     //myCanvas->Modified();
     servicesCompLegend->Draw();
 
     myContent->addItem(myTable);
     myImage = new RootWImage(std::move(myCanvas), 2*vis_min_canvas_sizeX, vis_min_canvas_sizeY);
-    myImage->setComment("Radiation and interaction length distribution in eta by component type in services");
+    myImage->setComment("Radiation and interaction length distribution in cos&theta; by component type in services");
     myImage->setName("matServicesComponentsFull");
     myContent->addItem(myImage);
 
@@ -868,14 +868,14 @@ namespace insur {
     myContentDetails = new RootWContent("Components details (Tracking volume)", false);
 
     myTable = new RootWTable();
-    sprintf(titleString, "Average (eta = [0, %.1f])", a.getEtaMaxMaterial());
+    sprintf(titleString, "Average (cos&theta; = [0, %.1f])", a.getEtaMaxMaterial());
     myTable->setContent(0, 0, titleString);
     myTable->setContent(0, 1, "Radiation length");
     myTable->setContent(0, 2, "Interaction length");
 
 
-    THStack* rCompTrackingVolumeStack = new THStack("rcomptrackingvolumestack", "Radiation Length by Component in tracking volume");
-    THStack* iCompTrackingVolumeStack = new THStack("icomptrackingvolumestack", "Interaction Length by Component in tracking volume");
+    THStack* rCompTrackingVolumeStack = new THStack("rcomptrackingvolumestack", "Radiation Length by Component in tracking volume;cos#theta; x/X_{0}");
+    THStack* iCompTrackingVolumeStack = new THStack("icomptrackingvolumestack", "Interaction Length by Component in tracking volume;cos#theta; #lambda/#lambda_{0}");
 
     TLegend* compLegendTrackingVolume = new TLegend(0.1,0.6,0.35,0.9);
 
@@ -934,7 +934,7 @@ namespace insur {
     myContentDetails->addItem(myTable);
 
     myImage = new RootWImage(std::move(myCanvas), 2*vis_min_canvas_sizeX, vis_min_canvas_sizeY);
-    myImage->setComment("Radiation and interaction length distribution in eta by component type in total tracking volume");
+    myImage->setComment("Radiation and interaction length distribution in cos&theta; by component type in total tracking volume");
     myImage->setName("matComponentsTrackingVolume");
     myContentDetails->addItem(myImage);
 
@@ -960,7 +960,7 @@ namespace insur {
       rTrackingVolumeProf = newProfile(rTrackingVolume, 0., a.getEtaMaxMaterial(), materialNBins);
       rTrackingVolumeProf->SetFillColor(kGray + 2);
       rTrackingVolumeProf->SetLineColor(kBlue);
-      rTrackingVolumeProf->SetTitle("Radiation Length within Tracking Volume; #eta; x/X_{0}");
+      rTrackingVolumeProf->SetTitle("Radiation Length within Tracking Volume; cos#theta; x/X_{0}");
       rTrackingVolumeProf->GetYaxis()->SetTitleOffset(1.3);
       rTrackingVolumeProf->Draw("hist");
     }
@@ -972,7 +972,7 @@ namespace insur {
       iTrackingVolumeProf = newProfile(iTrackingVolume, 0., a.getEtaMaxMaterial(), materialNBins);
       iTrackingVolumeProf->SetFillColor(kGray + 2);
       iTrackingVolumeProf->SetLineColor(kBlue);
-      iTrackingVolumeProf->SetTitle("Interaction Length within Tracking Volume; #eta; #lambda/#lambda_{0}");
+      iTrackingVolumeProf->SetTitle("Interaction Length within Tracking Volume; cos#theta; #lambda/#lambda_{0}");
       iTrackingVolumeProf->GetYaxis()->SetTitleOffset(1.3);
       iTrackingVolumeProf->Draw("hist");
     }
@@ -981,9 +981,9 @@ namespace insur {
     myImage->setComment("Material in tracking volume");
     myImage->setName("matOverviewTrackingVolume");
     myTable = new RootWTable();
-    sprintf(titleString, "Average radiation length in tracking volume (eta = [0, %.1f])", a.getEtaMaxMaterial());
+    sprintf(titleString, "Average radiation length in tracking volume (cos&theta; = [0, %.1f])", a.getEtaMaxMaterial());
     myTable->setContent(1, 1, titleString);
-    sprintf(titleString, "Average interaction length in tracking volume (eta = [0, %.1f])", a.getEtaMaxMaterial());
+    sprintf(titleString, "Average interaction length in tracking volume (cos&theta; = [0, %.1f])", a.getEtaMaxMaterial());
     myTable->setContent(2, 1, titleString);
     if (rTrackingVolume) myTable->setContent(1, 2, averageHistogramValues(*rTrackingVolume, a.getEtaMaxMaterial()), 5);
     if (iTrackingVolume) myTable->setContent(2, 2, averageHistogramValues(*iTrackingVolume, a.getEtaMaxMaterial()), 5);
@@ -999,13 +999,13 @@ namespace insur {
     myPage->addContent(myContent);
 
     myTable = new RootWTable();
-    sprintf(titleString, "Average (eta = [0, %.1f])", a.getEtaMaxMaterial());
+    sprintf(titleString, "Average (cos&theta; = [0, %.1f])", a.getEtaMaxMaterial());
     myTable->setContent(0, 0, titleString);
     myTable->setContent(0, 1, "Radiation length");
     myTable->setContent(0, 2, "Interaction length");
 
-    THStack* rServicesDetailsTrackingVolumeStack = new THStack("rservicescomptrackingvolumestack", "Radiation Length by Component");
-    THStack* iServicesDetailsTrackingVolumeStack = new THStack("iservicescomptrackingvolumestack", "Interaction Length by Component");
+    THStack* rServicesDetailsTrackingVolumeStack = new THStack("rservicescomptrackingvolumestack", "Radiation Length by Component;cos#theta; x/X_{0}");
+    THStack* iServicesDetailsTrackingVolumeStack = new THStack("iservicescomptrackingvolumestack", "Interaction Length by Component;cos#theta; #lambda/#lambda_{0}");
 
     TLegend* servicesTrackingVolumeLegend = new TLegend(0.1,0.6,0.35,0.9);
 
@@ -1036,7 +1036,7 @@ namespace insur {
       myTable->setContent(servicesTrackingVolumeIndex++, 1, averageHistogramValues(*histo, a.getEtaMaxMaterial()), 5);
     }
     rServicesDetailsTrackingVolumeStack->Draw("hist");  
-    //rServicesDetailsTrackingVolumeStack->GetXaxis()->SetTitle("#eta"); 
+    //rServicesDetailsTrackingVolumeStack->GetXaxis()->SetTitle("cos#theta"); 
     //myCanvas->Modified();
     servicesTrackingVolumeLegend->Draw();
 
@@ -1060,13 +1060,13 @@ namespace insur {
       myTable->setContent(servicesTrackingVolumeIndex++, 2, averageHistogramValues(*histo, a.getEtaMaxMaterial()), 5);
     }
     iServicesDetailsTrackingVolumeStack->Draw("hist");
-    //rServicesCompStack->GetXaxis()->SetTitle("#eta"); 
+    //rServicesCompStack->GetXaxis()->SetTitle("cos#theta"); 
     //myCanvas->Modified();
     servicesTrackingVolumeLegend->Draw();
 
     myContent->addItem(myTable);
     myImage = new RootWImage(std::move(myCanvas), 2*vis_min_canvas_sizeX, vis_min_canvas_sizeY);
-    myImage->setComment("Radiation and interaction length distribution in eta by component type in services");
+    myImage->setComment("Radiation and interaction length distribution in cos&theta; by component type in services");
     myImage->setName("matServicesDetailsTrackingVolume");
     myContent->addItem(myImage);
 
@@ -1172,7 +1172,7 @@ namespace insur {
     ranger->SetMaximum(1.);
     TAxis* myAxis;
     myAxis = ranger->GetXaxis();
-    myAxis->SetTitle("#eta");
+    myAxis->SetTitle("cos#theta");
     myAxis = ranger->GetYaxis();
     myAxis->SetTitle("Tracks fraction");
     ranger->Draw();
@@ -1218,15 +1218,15 @@ namespace insur {
 
     // Table explaining the cuts
     cutsTable.setContent(0,0,"Region");
-    cutsTable.setContent(1,0,"etaMin");
-    cutsTable.setContent(2,0,"etaMax");
+    cutsTable.setContent(1,0,"cos&theta;Min");
+    cutsTable.setContent(2,0,"cos&theta;Max");
 
     myTable = &cutsTable;
     for (unsigned int iBorder=0; iBorder<geom_name_eta_regions.size()-1; ++iBorder) {
       myTable->setContent(0,iBorder+1,geom_name_eta_regions[iBorder+1]);
-      label.str(""); label << std::fixed << std::setprecision(1) << geom_range_eta_regions[iBorder];
+      label.str(""); label << std::fixed << std::setprecision(2) << geom_range_eta_regions[iBorder];
       myTable->setContent(1,iBorder+1,label.str());
-      label.str(""); label << std::fixed << std::setprecision(1) << geom_range_eta_regions[iBorder+1];
+      label.str(""); label << std::fixed << std::setprecision(2) << geom_range_eta_regions[iBorder+1];
       myTable->setContent(2,iBorder+1,label.str());
     }
 
@@ -2949,31 +2949,31 @@ namespace insur {
     myCanvas.reset(new TCanvas("EtaProfileHits", "Eta profile (Hit Modules)", vis_min_canvas_sizeX, vis_min_canvas_sizeY));
     drawEtaProfiles(*myCanvas.get(), analyzer);
     myImage = new RootWImage(std::move(myCanvas), vis_min_canvas_sizeX, vis_min_canvas_sizeY);
-    myImage->setComment("Hit modules across costheta.");
+    myImage->setComment("Hit modules across cos&theta;.");
     myContent->addItem(myImage);
 
     myCanvas.reset(new TCanvas("EtaProfileSensors", "Eta profile (Hits)", vis_min_canvas_sizeX, vis_min_canvas_sizeY));
     drawEtaProfilesSensors(*myCanvas.get(), analyzer);
     myImage = new RootWImage(std::move(myCanvas), vis_min_canvas_sizeX, vis_min_canvas_sizeY);
-    myImage->setComment("Hit coverage across costheta.");
+    myImage->setComment("Hit coverage across cos&theta;.");
     myContent->addItem(myImage);
 
     myCanvas.reset(new TCanvas("EtaProfileStubs", "Eta profile (Stubs)", vis_min_canvas_sizeX, vis_min_canvas_sizeY));
     drawEtaProfilesStubs(*myCanvas.get(), analyzer);
     myImage = new RootWImage(std::move(myCanvas), vis_min_canvas_sizeX, vis_min_canvas_sizeY);
-    myImage->setComment("Stub coverage across costheta.");
+    myImage->setComment("Stub coverage across cos&theta;.");
     myContent->addItem(myImage);
 
     myCanvas.reset(new TCanvas("EtaProfileNumberOfStubsRatios", "Eta profile (Stubs)", vis_min_canvas_sizeX, vis_min_canvas_sizeY));
     if (myCanvas) drawTracksDistributionPerNumberOfStubs(*myCanvas.get(), analyzer, isPixelTracker);
     myImage = new RootWImage(std::move(myCanvas), vis_min_canvas_sizeX, vis_min_canvas_sizeY);
-    myImage->setComment("Stub coverage across costheta.");
+    myImage->setComment("Stub coverage across cos&theta;.");
     myContent->addItem(myImage);
 
     myCanvas.reset(new TCanvas("EtaProfileLayers", "Eta profile (Layers)", vis_min_canvas_sizeX, vis_min_canvas_sizeY));
     drawEtaProfilesLayers(*myCanvas.get(), analyzer);
     myImage = new RootWImage(std::move(myCanvas), vis_min_canvas_sizeX, vis_min_canvas_sizeY);
-    myImage->setComment("Layer coverage across costheta.");
+    myImage->setComment("Layer coverage across cos&theta;.");
     myContent->addItem(myImage);
 
     if (!isPixelTracker) {
@@ -2995,7 +2995,7 @@ namespace insur {
     analyzer.getMapPhiEta().SetStats(0);
     hitMapCanvas->Modified();
     myImage = new RootWImage(std::move(hitMapCanvas), vis_min_canvas_sizeX, vis_min_canvas_sizeY);
-    myImage->setComment("Hit coverage in costheta, phi");
+    myImage->setComment("Hit coverage in cos&theta;, phi");
     myContent->addItem(myImage);
 
     drawHitCoveragePerLayer(*myPage, analyzer, isPixelTracker);
@@ -3184,7 +3184,7 @@ namespace insur {
     for (auto& layerIt : coveragePerLayer) {
       const std::string layerName = layerIt.first;
 
-      std::unique_ptr<TCanvas> myCanvas(new TCanvas(Form("LayerCoverage%s%s", layerName.c_str(), type.c_str()), ("Layer costheta coverage (" + type + ")").c_str(), vis_std_canvas_sizeX, vis_min_canvas_sizeY));
+      std::unique_ptr<TCanvas> myCanvas(new TCanvas(Form("LayerCoverage%s%s", layerName.c_str(), type.c_str()), ("Layer cos&theta; coverage (" + type + ")").c_str(), vis_std_canvas_sizeX, vis_min_canvas_sizeY));
       myCanvas->cd();
 
       // Distribution of tracks with at least 1 hit / stub.
@@ -3236,7 +3236,7 @@ namespace insur {
 	upperRightPad->cd();
 	TH1D* efficiencyHistogram = new TH1D(Form("%s_histo", overallCoverage.GetName()), overallCoverage.GetTitle(), 50, 0, .1);
 	efficiencyHistogram->SetXTitle("Inefficiency");
-	efficiencyHistogram->SetYTitle("cosTheta bins");
+	efficiencyHistogram->SetYTitle("cos&theta; bins");
 	efficiencyHistogram->SetFillColor(Palette::color(1));
 	efficiencyHistogram->Draw();
 	for (int i=1; i<=overallCoverage.GetNbinsX(); ++i) 
@@ -3280,7 +3280,7 @@ namespace insur {
 
       RootWImage* myImage = new RootWImage(std::move(myCanvas), vis_std_canvas_sizeX, vis_min_canvas_sizeY);
       const std::string title = (type.find("stub") != std::string::npos ? "stub" : type);
-      myImage->setComment("Layer coverage in costheta for " + title + "s.");
+      myImage->setComment("Layer coverage in cos&theta; for " + title + "s.");
       myContent->addItem(myImage);
     }
 
@@ -3410,7 +3410,7 @@ namespace insur {
     TProfile* prof;
     TH1D* histo;
     for (const auto& it : histoMap) {
-      prof = newProfile((TH1D*)it.second, 0., 4.0, materialNBins);
+      prof = newProfile((TH1D*)it.second, 0., 1.0, materialNBins);
       histo = prof->ProjectionX();
       histo->SetLineColor(Palette::color(index));
       histo->SetFillColor(Palette::color(index));
@@ -3420,7 +3420,7 @@ namespace insur {
       totalStack->Add(histo);
       myTable->setContent(index, 0, it.first);
       int column = (isRadiation ? 1 : 2);
-      myTable->setContent(index++, column, averageHistogramValues(*histo, 4.0), 5);
+      myTable->setContent(index++, column, averageHistogramValues(*histo, 1.0), 5);
     }
   }
 
@@ -3429,7 +3429,7 @@ namespace insur {
     TProfile* prof;
     TH1D* histo;
     for (const auto& it : histoMap) {
-      prof = newProfile((TH1D*)it.second, 0., 4.0, materialNBins);
+      prof = newProfile((TH1D*)it.second, 0., 1.0, materialNBins);
       histo = prof->ProjectionX();
       histo->SetLineColor(Palette::color(index));
       histo->SetFillColor(Palette::color(index));
@@ -3439,7 +3439,7 @@ namespace insur {
       totalStack->Add(histo);
       myTable->setContent(index, 0, it.first);
       int column = (isRadiation ? 1 : 2);
-      myTable->setContent(index++, column, averageHistogramValues(*histo, 4.0), 5);
+      myTable->setContent(index++, column, averageHistogramValues(*histo, 1.0), 5);
     }
   }
 
@@ -3459,7 +3459,7 @@ namespace insur {
     // COMPONENTS DETAILS (TRACKING VOLUME)
     RootWTable* myTable = new RootWTable();
     char titleString[256];
-    sprintf(titleString, "Average (eta = [0, %.1f])", analyzer.getEtaMaxMaterial());
+    sprintf(titleString, "Average (cos&theta; = [0, %.1f])", analyzer.getEtaMaxMaterial());
     myTable->setContent(0, 0, titleString);
     myTable->setContent(0, 1, "Radiation length");
     myTable->setContent(0, 2, "Interaction length");
@@ -3511,13 +3511,13 @@ namespace insur {
 
     materialComponentsContent->addItem(myTable);
     myImage = new RootWImage(std::move(myCanvas), 2*vis_min_canvas_sizeX, vis_min_canvas_sizeY);
-    myImage->setComment("Radiation and interaction length distribution in eta by component type in total tracking volume");
+    myImage->setComment("Radiation and interaction length distribution in cos&theta; by component type in total tracking volume");
     myImage->setName("fullLayoutMatComponentsTrackingVolume");
     materialComponentsContent->addItem(myImage);
 
     // CATEGORIES DETAILS (TRACKING VOLUME)
     myTable = new RootWTable();
-    sprintf(titleString, "Average (eta = [0, %.1f])", analyzer.getEtaMaxMaterial());
+    sprintf(titleString, "Average (cos&theta; = [0, %.1f])", analyzer.getEtaMaxMaterial());
     myTable->setContent(0, 0, titleString);
     myTable->setContent(0, 1, "Radiation length");
     myTable->setContent(0, 2, "Interaction length");
@@ -3562,7 +3562,7 @@ namespace insur {
 
     materialCategoriesContent->addItem(myTable);
     myImage = new RootWImage(std::move(myCanvas), 2*vis_min_canvas_sizeX, vis_min_canvas_sizeY);
-    myImage->setComment("Radiation and interaction length distribution in eta by category in total tracking volume");
+    myImage->setComment("Radiation and interaction length distribution in cos&theta; by category in total tracking volume");
     myImage->setName("fullLayoutMatCategoriesTrackingVolume");
     materialCategoriesContent->addItem(myImage);
    
@@ -3582,7 +3582,7 @@ namespace insur {
       cr = (TH1D*)rCompTotalTrackingVolumeStack->GetStack()->Last()->Clone();
       crProf = newProfile(cr, 0., analyzer.getEtaMaxMaterial(), materialNBins);
       crProf->SetFillColor(kGray + 2);
-      crProf->SetTitle("Radiation Length within Full Tracking Volume; #eta; x/X_{0}");
+      crProf->SetTitle("Radiation Length within Full Tracking Volume; cos#theta; x/X_{0}");
       crProf->GetYaxis()->SetTitleOffset(1.3);
       crProf->Draw("hist");
     }
@@ -3593,7 +3593,7 @@ namespace insur {
       ci = (TH1D*)iCompTotalTrackingVolumeStack->GetStack()->Last()->Clone();
       ciProf = newProfile(ci, 0., analyzer.getEtaMaxMaterial(), materialNBins);
       ciProf->SetFillColor(kGray + 2);
-      ciProf->SetTitle("Interaction Length within Full Tracking Volume; #eta; #lambda/#lambda_{0}");
+      ciProf->SetTitle("Interaction Length within Full Tracking Volume; cos#theta; #lambda/#lambda_{0}");
       ciProf->GetYaxis()->SetTitleOffset(1.3);
       ciProf->Draw("hist");
     }
@@ -3602,9 +3602,9 @@ namespace insur {
     myImage->setComment("Material in total tracking volume");
     myImage->setName("fullLayoutMatOverviewTrackingVolume");
     myTable = new RootWTable();
-    sprintf(titleString, "Average radiation length in tracking volume (eta = [0, %.1f])", analyzer.getEtaMaxMaterial());
+    sprintf(titleString, "Average radiation length in tracking volume (cos&theta; = [0, %.1f])", analyzer.getEtaMaxMaterial());
     myTable->setContent(1, 1, titleString);
-    sprintf(titleString, "Average interaction length in tracking volume (eta = [0, %.1f])", analyzer.getEtaMaxMaterial());
+    sprintf(titleString, "Average interaction length in tracking volume (cos&theta; = [0, %.1f])", analyzer.getEtaMaxMaterial());
     myTable->setContent(2, 1, titleString);
     if (cr) myTable->setContent(1, 2, averageHistogramValues(*cr, analyzer.getEtaMaxMaterial()), 5);
     if (ci) myTable->setContent(2, 2, averageHistogramValues(*ci, analyzer.getEtaMaxMaterial()), 5);
@@ -3633,7 +3633,7 @@ namespace insur {
     //*                              *//
     //********************************//
 
-    // Detector full layout
+    // Detector full layout //
     std::unique_ptr<TCanvas> aLayout = drawFullLayoutRZ();
     std::unique_ptr<TCanvas> aLayoutServices = drawFullLayoutServicesRZ();
     std::unique_ptr<TCanvas> aLayoutXY = drawFullLayoutBarrelXY();
@@ -4527,10 +4527,10 @@ namespace insur {
       site.addPage(myPage);
 
       // Create the contents
-      RootWContent& resolutionContent_Pt      = myPage->addContent("Track resolution for const Pt across "  +etaLetter+" (material)");
-      RootWContent& idealResolutionContent_Pt = myPage->addContent("Track resolution for const Pt across "  +etaLetter+" (no material)", false);
-      RootWContent& resolutionContent_P       = myPage->addContent("Track resolution for const P across "   +etaLetter+" (material)"   , false);
-      RootWContent& idealResolutionContent_P  = myPage->addContent("Track resolution for const P across "   +etaLetter+" (no material)", false);
+      RootWContent& resolutionContent_Pt      = myPage->addContent("Track resolution for const Pt across "  +costhetaLetter+" (material)");
+      RootWContent& idealResolutionContent_Pt = myPage->addContent("Track resolution for const Pt across "  +costhetaLetter+" (no material)", false);
+      RootWContent& resolutionContent_P       = myPage->addContent("Track resolution for const P across "   +costhetaLetter+" (material)"   , false);
+      RootWContent& idealResolutionContent_P  = myPage->addContent("Track resolution for const P across "   +costhetaLetter+" (no material)", false);
 
       // Create a page for the errors - scenarios with/without multiple scattering (active+pasive or just active material), extra scenario includes dipole magnet
       std::string scenarioStr="";
@@ -4723,7 +4723,7 @@ namespace insur {
               plotOption = "same";
             }
           }
-          // Draw ctgTheta and eta
+          // Draw ctgTheta and costheta
           plotOption = "";
           myColor    = 0;
           for (const auto& mapel : gb.getTaggedGraphs(GraphBag::CtgthetaGraph_Pt | idealMaterial, tag)) {
@@ -4731,7 +4731,7 @@ namespace insur {
             const TGraph& ctgThetaGraph = mapel.second;
             TProfile& ctgThetaProfile   = newProfile(ctgThetaGraph, 0, analyzer.getEtaMaxTracker(), 1, nBins);
 	    TProfile& etaProfile        = newProfile_timesSin(ctgThetaGraph, 0, analyzer.getEtaMaxTracker(), 1, nBins);
-	    etaProfile.SetTitle("Pseudorapidity error - const P_{T} across #eta;#eta;#delta #eta");
+	    etaProfile.SetTitle("Pseudorapidity error - const P_{T} across cos#theta;cos#theta;#delta cos#theta");
 
             ctgThetaProfile.SetMinimum(vis_min_dCtgTheta);
             ctgThetaProfile.SetMaximum(vis_max_dCtgTheta);
@@ -4875,51 +4875,51 @@ namespace insur {
           }
 
           RootWImage& linMomImage_Pt = myContent->addImage(std::move(linMomCanvas_Pt), vis_std_canvas_sizeX, vis_min_canvas_sizeY);
-          linMomImage_Pt.setComment("Transverse momentum resolution vs. "+etaLetter+" (linear scale) - const Pt across "+etaLetter);
+          linMomImage_Pt.setComment("Transverse momentum resolution vs. "+costhetaLetter+" (linear scale) - const Pt across "+costhetaLetter);
           linMomImage_Pt.setName(Form("linptres_%s_%s", tag.c_str(), scenarioStr.c_str()));
 
           RootWImage& logMomImage_Pt = myContent->addImage(std::move(logMomCanvas_Pt), vis_std_canvas_sizeX, vis_min_canvas_sizeY);
-          logMomImage_Pt.setComment("Transverse momentum resolution vs. "+etaLetter+" (log scale) - const Pt across "+etaLetter);
+          logMomImage_Pt.setComment("Transverse momentum resolution vs. "+costhetaLetter+" (log scale) - const Pt across "+costhetaLetter);
           logMomImage_Pt.setName(Form("ptres_%s_%s", tag.c_str(), scenarioStr.c_str()));
 
           RootWImage& pImage_Pt = myContent->addImage(std::move(pCanvas_Pt), vis_std_canvas_sizeX, vis_min_canvas_sizeY);
-          pImage_Pt.setComment("Momentum resolution vs. "+etaLetter+" - const Pt across "+etaLetter);
+          pImage_Pt.setComment("Momentum resolution vs. "+costhetaLetter+" - const Pt across "+costhetaLetter);
           pImage_Pt.setName(Form("pres_%s_%s", tag.c_str(), scenarioStr.c_str()));
 
           RootWImage& d0Image_Pt = myContent->addImage(std::move(d0Canvas_Pt), vis_std_canvas_sizeX, vis_min_canvas_sizeY);
-          d0Image_Pt.setComment("d0 resolution vs. "+etaLetter+" - const Pt across "+etaLetter);
+          d0Image_Pt.setComment("d0 resolution vs. "+costhetaLetter+" - const Pt across "+costhetaLetter);
           d0Image_Pt.setName(Form("dxyres_%s_%s", tag.c_str(), scenarioStr.c_str()));
 
           RootWImage& z0Image_Pt = myContent->addImage(std::move(z0Canvas_Pt), vis_std_canvas_sizeX, vis_min_canvas_sizeY);
-          z0Image_Pt.setComment("z0 resolution vs. "+etaLetter+" - const Pt across "+etaLetter);
+          z0Image_Pt.setComment("z0 resolution vs. "+costhetaLetter+" - const Pt across "+costhetaLetter);
           z0Image_Pt.setName(Form("dzres_%s_%s", tag.c_str(), scenarioStr.c_str()));
 
           RootWImage& lImage_Pt = myContent->addImage(std::move(lCanvas_Pt), vis_std_canvas_sizeX, vis_min_canvas_sizeY);
-          lImage_Pt.setComment("L resolution vs. "+etaLetter+" - const Pt across "+etaLetter);
+          lImage_Pt.setComment("L resolution vs. "+costhetaLetter+" - const Pt across "+costhetaLetter);
           lImage_Pt.setName(Form("lres_%s_%s", tag.c_str(), scenarioStr.c_str()));
 
           RootWImage& betaImage_Pt = myContent->addImage(std::move(betaCanvas_Pt), vis_std_canvas_sizeX, vis_min_canvas_sizeY);
-          betaImage_Pt.setComment("Relative influence of #sigma_{d0} (max for #beta=#pi/2) and #sigma_{z0} (max for #beta=0) - const Pt across "+etaLetter);
+          betaImage_Pt.setComment("Relative influence of #sigma_{d0} (max for #beta=#pi/2) and #sigma_{z0} (max for #beta=0) - const Pt across "+costhetaLetter);
           betaImage_Pt.setName(Form("beta_%s_%s", tag.c_str(), scenarioStr.c_str()));
 
           RootWImage& omegaImage_Pt = myContent->addImage(std::move(omegaCanvas_Pt), vis_std_canvas_sizeX, vis_min_canvas_sizeY);
-          omegaImage_Pt.setComment("Pixel aspect ratio optimzation (for fixed pixel area). #Omega=#pi/2 means you need longer pixels - const Pt across "+etaLetter);
+          omegaImage_Pt.setComment("Pixel aspect ratio optimzation (for fixed pixel area). #Omega=#pi/2 means you need longer pixels - const Pt across "+costhetaLetter);
           omegaImage_Pt.setName(Form("omega_%s_%s", tag.c_str(), scenarioStr.c_str()));
 
           RootWImage& phiImage_Pt = myContent->addImage(std::move(phiCanvas_Pt), vis_std_canvas_sizeX, vis_min_canvas_sizeY);
-          phiImage_Pt.setComment("Angle resolution vs. "+etaLetter+" - const Pt across "+etaLetter);
+          phiImage_Pt.setComment("Angle resolution vs. "+costhetaLetter+" - const Pt across "+costhetaLetter);
           phiImage_Pt.setName(Form("phires_%s_%s", tag.c_str(), scenarioStr.c_str()));
 
           RootWImage& ctgThetaImage_Pt = myContent->addImage(std::move(ctgThetaCanvas_Pt), vis_std_canvas_sizeX, vis_min_canvas_sizeY);
-          ctgThetaImage_Pt.setComment("Ctg("+thetaLetter+") resolution vs. "+etaLetter+" - const Pt across "+etaLetter);
+          ctgThetaImage_Pt.setComment("Ctg("+thetaLetter+") resolution vs. "+costhetaLetter+" - const Pt across "+costhetaLetter);
           ctgThetaImage_Pt.setName(Form("cotThetares_%s_%s", tag.c_str(), scenarioStr.c_str()));
 
           RootWImage& etaImage_Pt = myContent->addImage(std::move(etaCanvas_Pt), vis_std_canvas_sizeX, vis_min_canvas_sizeY);
-          etaImage_Pt.setComment(etaLetter+" resolution vs. "+etaLetter+" - const Pt across "+etaLetter);
+          etaImage_Pt.setComment(costhetaLetter+" resolution vs. "+costhetaLetter+" - const Pt across "+costhetaLetter);
           etaImage_Pt.setName(Form("etares_%s_%s", tag.c_str(), scenarioStr.c_str()));
         }
 
-        // Draw case II with const P across eta
+        // Draw case II with const P across costheta
         if (!gb.getTaggedGraphs(GraphBag::RealGraph | GraphBag::RhoGraph_P     , tag).empty() &&
             !gb.getTaggedGraphs(GraphBag::RealGraph | GraphBag::DGraph_P       , tag).empty() &&
             !gb.getTaggedGraphs(GraphBag::RealGraph | GraphBag::Z0Graph_P      , tag).empty() &&
@@ -5104,7 +5104,7 @@ namespace insur {
               plotOption = "same";
             }
           }
-          // Draw ctgTheta and eta
+          // Draw ctgTheta and costheta
           plotOption = "";
           myColor    = 0;
           for (const auto& mapel : gb.getTaggedGraphs(GraphBag::CtgthetaGraph_P | idealMaterial, tag)) {
@@ -5112,7 +5112,7 @@ namespace insur {
             const TGraph& ctgThetaGraph = mapel.second;
             TProfile& ctgThetaProfile   = newProfile(ctgThetaGraph, 0, analyzer.getEtaMaxTracker(), 1, nBins);
             TProfile& etaProfile        = newProfile_timesSin(ctgThetaGraph, 0, analyzer.getEtaMaxTracker(), 1, nBins);
-	    etaProfile.SetTitle("Pseudorapidity error - const P across #eta;#eta;#delta #eta");
+	    etaProfile.SetTitle("Pseudorapidity error - const P across cos#theta;cos#theta;#delta cos#theta");
 
             ctgThetaProfile.SetMinimum(vis_min_dCtgTheta);
             ctgThetaProfile.SetMaximum(vis_max_dCtgTheta);
@@ -5258,47 +5258,47 @@ namespace insur {
           }
 
           RootWImage& linMomImage_P = myContent->addImage(std::move(linMomCanvas_P), vis_std_canvas_sizeX, vis_min_canvas_sizeY);
-          linMomImage_P.setComment("Transverse momentum resolution vs. "+etaLetter+" (linear scale) - const P across "+etaLetter);
+          linMomImage_P.setComment("Transverse momentum resolution vs. "+costhetaLetter+" (linear scale) - const P across "+costhetaLetter);
           linMomImage_P.setName(Form("linptres_%s_%s", tag.c_str(), scenarioStr.c_str()));
 
           RootWImage& logMomImage_P = myContent->addImage(std::move(logMomCanvas_P), vis_std_canvas_sizeX, vis_min_canvas_sizeY);
-          logMomImage_P.setComment("Transverse momentum resolution vs. "+etaLetter+" (log scale) - const P across "+etaLetter);
+          logMomImage_P.setComment("Transverse momentum resolution vs. "+costhetaLetter+" (log scale) - const P across "+costhetaLetter);
           logMomImage_P.setName(Form("ptres_%s_%s", tag.c_str(), scenarioStr.c_str()));
 
           RootWImage& pImage_P = myContent->addImage(std::move(pCanvas_P), vis_std_canvas_sizeX, vis_min_canvas_sizeY);
-          pImage_P.setComment("Momentum resolution vs. "+etaLetter+" - const P across "+etaLetter);
+          pImage_P.setComment("Momentum resolution vs. "+costhetaLetter+" - const P across "+costhetaLetter);
           pImage_P.setName(Form("pres_%s_%s", tag.c_str(), scenarioStr.c_str()));
 
           RootWImage& d0Image_P = myContent->addImage(std::move(d0Canvas_P), vis_std_canvas_sizeX, vis_min_canvas_sizeY);
-          d0Image_P.setComment("d0 resolution vs. "+etaLetter+" - const P across "+etaLetter);
+          d0Image_P.setComment("d0 resolution vs. "+costhetaLetter+" - const P across "+costhetaLetter);
           d0Image_P.setName(Form("dxyres_%s_%s", tag.c_str(), scenarioStr.c_str()));
 
           RootWImage& z0Image_P = myContent->addImage(std::move(z0Canvas_P), vis_std_canvas_sizeX, vis_min_canvas_sizeY);
-          z0Image_P.setComment("z0 resolution vs. "+etaLetter+" - const P across "+etaLetter);
+          z0Image_P.setComment("z0 resolution vs. "+costhetaLetter+" - const P across "+costhetaLetter);
           z0Image_P.setName(Form("dzres_%s_%s", tag.c_str(), scenarioStr.c_str()));
 
           RootWImage& lImage_P = myContent->addImage(std::move(lCanvas_P), vis_std_canvas_sizeX, vis_min_canvas_sizeY);
-          lImage_P.setComment("L resolution vs. "+etaLetter+" - const P across "+etaLetter);
+          lImage_P.setComment("L resolution vs. "+costhetaLetter+" - const P across "+costhetaLetter);
           lImage_P.setName(Form("lres_%s_%s", tag.c_str(), scenarioStr.c_str()));
 
           RootWImage& betaImage_P = myContent->addImage(std::move(betaCanvas_P), vis_std_canvas_sizeX, vis_min_canvas_sizeY);
-          betaImage_P.setComment("Relative influence of #sigma_{d0} (max for #beta=#pi/2) and #sigma_{z0} (max for #beta=0) - const P across "+etaLetter);
+          betaImage_P.setComment("Relative influence of #sigma_{d0} (max for #beta=#pi/2) and #sigma_{z0} (max for #beta=0) - const P across "+costhetaLetter);
           betaImage_P.setName(Form("beta_%s_%s", tag.c_str(), scenarioStr.c_str()));
 
           RootWImage& omegaImage_P = myContent->addImage(std::move(omegaCanvas_P), vis_std_canvas_sizeX, vis_min_canvas_sizeY);
-          omegaImage_P.setComment("Pixel aspect ratio optimzation (for fixed pixel area). #Omega=#pi/2 means you need longer pixels - const P across "+etaLetter);
+          omegaImage_P.setComment("Pixel aspect ratio optimzation (for fixed pixel area). #Omega=#pi/2 means you need longer pixels - const P across "+costhetaLetter);
           omegaImage_P.setName(Form("omega_%s_%s", tag.c_str(), scenarioStr.c_str()));
 
           RootWImage& phiImage_P = myContent->addImage(std::move(phiCanvas_P), vis_std_canvas_sizeX, vis_min_canvas_sizeY);
-          phiImage_P.setComment("Angle resolution vs. "+etaLetter+" - const P across "+etaLetter);
+          phiImage_P.setComment("Angle resolution vs. "+costhetaLetter+" - const P across "+costhetaLetter);
           phiImage_P.setName(Form("phires_%s_%s", tag.c_str(), scenarioStr.c_str()));
 
           RootWImage& ctgThetaImage_P = myContent->addImage(std::move(ctgThetaCanvas_P), vis_std_canvas_sizeX, vis_min_canvas_sizeY);
-          ctgThetaImage_P.setComment("Ctg("+thetaLetter+") resolution vs. "+etaLetter+" - const P across "+etaLetter);
+          ctgThetaImage_P.setComment("Ctg("+thetaLetter+") resolution vs. "+costhetaLetter+" - const P across "+costhetaLetter);
           ctgThetaImage_P.setName(Form("cotThetares_%s_%s", tag.c_str(), scenarioStr.c_str()));
 
           RootWImage& etaImage_P = myContent->addImage(std::move(etaCanvas_P), vis_std_canvas_sizeX, vis_min_canvas_sizeY);
-          etaImage_P.setComment(etaLetter+") resolution vs. "+etaLetter+" - const P across "+etaLetter);
+          etaImage_P.setComment(costhetaLetter+") resolution vs. "+costhetaLetter+" - const P across "+costhetaLetter);
           etaImage_P.setName(Form("etares_%s_%s", tag.c_str(), scenarioStr.c_str()));
         }
       } // Scenarios
@@ -5306,7 +5306,7 @@ namespace insur {
       // Set Summary content - case I
       //  check that the ideal and real have the same pts
       //  otherwise the table cannot be prepared
-      RootWContent& summaryContent_Pt = myPage->addContent("Summary - const Pt across "+etaLetter);
+      RootWContent& summaryContent_Pt = myPage->addContent("Summary - const Pt across "+costhetaLetter);
       RootWTable&   cutsSummaryTable  = summaryContent_Pt.addTable();
       RootWTable&   momSummaryTable   = summaryContent_Pt.addTable();
 
@@ -5335,8 +5335,8 @@ namespace insur {
 
       // Table explaining the cuts
       cutsSummaryTable.setContent(0,0,"Region: ");
-      cutsSummaryTable.setContent(1,0,"Min "+etaLetter+":");
-      cutsSummaryTable.setContent(2,0,"Max "+etaLetter+":");
+      cutsSummaryTable.setContent(1,0,"Min "+costhetaLetter+":");
+      cutsSummaryTable.setContent(2,0,"Max "+costhetaLetter+":");
 
       myTable = &cutsSummaryTable;
       for (unsigned int iBorder=0; iBorder<geom_name_eta_regions.size()-1; ++iBorder) {
@@ -5453,7 +5453,7 @@ namespace insur {
 
       //
       // Set Summary content - case II
-      RootWContent& summaryContent_P = myPage->addContent("Summary - const P across "+etaLetter, false);
+      RootWContent& summaryContent_P = myPage->addContent("Summary - const P across "+costhetaLetter, false);
 
       std::map<std::string, RootWTable*> tableMap_P;
 
@@ -5578,7 +5578,7 @@ namespace insur {
 
     for (const auto& pIter : mainConfig.getMomenta()) {
 
-      a.hisPatternRecoInOutPt[iMomentum]->SetNameTitle(std::string("hisPatternRecoInOutPt"+any2str(pIter/Units::GeV)+"GeV").c_str(),"In-Out: Bkg contamination prob. in 95% area of 2D error ellipse accumulated accross N layers;#eta;1 - #Pi_{i=1}^{N} (1-p^{i}_{bkg_95%})");
+      a.hisPatternRecoInOutPt[iMomentum]->SetNameTitle(std::string("hisPatternRecoInOutPt"+any2str(pIter/Units::GeV)+"GeV").c_str(),"In-Out: Bkg contamination prob. in 95% area of 2D error ellipse accumulated accross N layers;cos#theta;1 - #Pi_{i=1}^{N} (1-p^{i}_{bkg_95%})");
       a.hisPatternRecoInOutPt[iMomentum]->SetLineWidth(2.);
       a.hisPatternRecoInOutPt[iMomentum]->SetMarkerStyle(21);
       a.hisPatternRecoInOutPt[iMomentum]->SetMarkerSize(1.);
@@ -5613,7 +5613,7 @@ namespace insur {
 
     for (const auto& pIter : mainConfig.getMomenta()) {
 
-      a.hisPatternRecoOutInPt[iMomentum]->SetNameTitle(std::string("hisPatternRecoOutInPt"+any2str(pIter/Units::GeV)+"GeV").c_str(),"Out-In: Bkg contamination prob. in 95% area of 2D error ellipse accumulated accross N layers;#eta;1 - #Pi_{i=1}^{N} (1-p^{i}_{bkg_95%})");
+      a.hisPatternRecoOutInPt[iMomentum]->SetNameTitle(std::string("hisPatternRecoOutInPt"+any2str(pIter/Units::GeV)+"GeV").c_str(),"Out-In: Bkg contamination prob. in 95% area of 2D error ellipse accumulated accross N layers;cos#theta;1 - #Pi_{i=1}^{N} (1-p^{i}_{bkg_95%})");
       a.hisPatternRecoOutInPt[iMomentum]->SetLineWidth(2.);
       a.hisPatternRecoOutInPt[iMomentum]->SetMarkerStyle(21);
       a.hisPatternRecoOutInPt[iMomentum]->SetMarkerSize(1.);
@@ -5656,7 +5656,7 @@ namespace insur {
       for (const auto& pIter : mainConfig.getMomenta()) {
 
         auto & profHis = iterMap.second;
-        profHis[iMomentum]->SetNameTitle(std::string("canvasPtD0InOut"+name+any2str(pIter/Units::GeV)+"GeV").c_str(),std::string(name+" In-Out approach: an extrapolated #sigma_{R-#Phi} from previous layers/discs;#eta; #sigma_{R-#Phi} [#mum]").c_str());
+        profHis[iMomentum]->SetNameTitle(std::string("canvasPtD0InOut"+name+any2str(pIter/Units::GeV)+"GeV").c_str(),std::string(name+" In-Out approach: an extrapolated #sigma_{R-#Phi} from previous layers/discs;cos#theta; #sigma_{R-#Phi} [#mum]").c_str());
         profHis[iMomentum]->SetLineWidth(2.);
         profHis[iMomentum]->SetMarkerStyle(21);
         profHis[iMomentum]->SetMarkerSize(1.);
@@ -5699,7 +5699,7 @@ namespace insur {
       for (const auto& pIter : mainConfig.getMomenta()) {
 
         auto & profHis = iterMap.second;
-        profHis[iMomentum]->SetNameTitle(std::string("canvasPtZ0InOut"+name+any2str(pIter/Units::GeV)+"GeV").c_str(),std::string(name+" In-Out approach: an extrapolated #sigma_{Z} from previous layers/discs;#eta; #sigma_{Z} [#mum]").c_str());
+        profHis[iMomentum]->SetNameTitle(std::string("canvasPtZ0InOut"+name+any2str(pIter/Units::GeV)+"GeV").c_str(),std::string(name+" In-Out approach: an extrapolated #sigma_{Z} from previous layers/discs;cos#theta; #sigma_{Z} [#mum]").c_str());
         profHis[iMomentum]->SetLineWidth(2.);
         profHis[iMomentum]->SetMarkerStyle(21);
         profHis[iMomentum]->SetMarkerSize(1.);
@@ -8611,7 +8611,7 @@ namespace insur {
     //double sintheta;
     for (int i=0; i<sourceGraph.GetN(); ++i) {
       sourceGraph.GetPoint(i, x, y);
-      resultProfile->Fill(x, y/cosh(x));
+      resultProfile->Fill(x, y*sin(acos(x)*(1-x*x)));
     }
     return (*resultProfile);
   }
