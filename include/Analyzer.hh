@@ -187,7 +187,8 @@ namespace insur {
                                bool isPixel,
                                bool& debugResolution,
                                int etaSteps = 50,
-                               MaterialBudget* pm = nullptr);
+                               MaterialBudget* pm = nullptr,
+                               std::string hit_dir = "");
     bool checkFile(const std::string& fileName, const std::string& filePath);
     bool isTripletFromDifLayers(Track& track, int iHit, bool propagOutIn);
     bool analyzePatterReco(MaterialBudget& mb, mainConfigHandler& mainConfig, int etaSteps = 50, MaterialBudget* pm = nullptr);
@@ -320,6 +321,10 @@ namespace insur {
     inline double getEtaMaxTrigger()  const { return insur::geom_max_eta_coverage;}
 
     const std::string & getBillOfMaterials() { return billOfMaterials_ ; }
+
+    // for hit information
+    //void set_hit_dir(std::string dir){hit_info_dir = dir;}
+    //const std::string & get_hit_dir() {return hit_info_dir ; }
   protected:
     /**
      * @struct Cell
@@ -477,11 +482,13 @@ namespace insur {
     void calculateGraphsConstPt(const int& aMomentum,
                                 const TrackCollection& aTrackCollection,
                                 int graphAttributes,
-                                const string& graphTag);
+                                const string& graphTag,
+                                std::string hit_dir);
     void calculateGraphsConstP(const int& aMomentum,
                                const TrackCollection& aTrackCollection,
                                int graphAttributes,
-                               const string& graphTag);
+                               const string& graphTag,
+                               std::string hit_dir);
     void calculateParametrizedResolutionPlots(std::map<std::string, TrackCollectionMap>& taggedTrackPtCollectionMap);
     void fillTriggerEfficiencyGraphs(const Tracker& tracker,
                                      const std::vector<double>& triggerMomenta,
@@ -501,6 +508,7 @@ namespace insur {
     void transformEtaToZ();
     double findXThreshold(const TProfile& aProfile, const double& yThreshold, const bool& goForward );
     std::pair<double, double> computeMinMaxTracksEta(const Tracker& t) const;
+    
 
   private:
     // A random number generator
@@ -551,6 +559,8 @@ namespace insur {
     static int bsCounter;
     
     std::string billOfMaterials_;
+    // for hit information
+    //std::string hit_info_dir;
   };
 }
 #endif  /* _ANALYZER_H */

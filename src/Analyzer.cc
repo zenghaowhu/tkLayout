@@ -174,7 +174,8 @@ void Analyzer::createTaggedTrackCollection(std::vector<MaterialBudget*> material
 				       bool isPixel,
 				       bool& debugResolution,
 				       int etaSteps,
-				       MaterialBudget* pm) {
+				       MaterialBudget* pm,
+                       std::string hit_dir) {
 
   materialTracksUsed = etaSteps;
 
@@ -225,8 +226,14 @@ void Analyzer::createTaggedTrackCollection(std::vector<MaterialBudget*> material
     HitPtr hit(new Hit(rPos, zPos, nullptr, HitPassiveType::BeamPipe));
 
     Material material;
-    material.radiation   = 0.0022761 / sin(theta);  // was 0.0023, adapted to fit CMSSW 81X 2016/11/30
-    material.interaction = 0.0020334 / sin(theta);  // was 0.0019, adapted to fit CMSSW 81X 2016/11/30
+    //material.radiation   = 0.0022761 / sin(theta);  // was 0.0023, adapted to fit CMSSW 81X 2016/11/30
+    //material.interaction = 0.0020334 / sin(theta);  // was 0.0019, adapted to fit CMSSW 81X 2016/11/30
+    //material.radiation   = 0.0034462 / sin(theta);  // inner Beryllium: 0.50mm, gap: 0.50mm paraffin, outer Beryllium: 0.35mm
+    //material.interaction = 0.0026133 / sin(theta);  
+    material.radiation   = 0.0014172 / sin(theta);  //CDR beam pipe,  Beryllium: 0.50mm,
+    material.interaction = 0.0011876 / sin(theta);  
+    //material.radiation   = 0.0024094 / sin(theta);  // inner Beryllium: 0.50mm, gap: 0.50mm Helium gas, outer Beryllium: 0.35mm
+    //material.interaction = 0.0020191 / sin(theta);  
     hit->setCorrectedMaterial(material);
     track.addHit(std::move(hit));
 
@@ -305,6 +312,12 @@ void Analyzer::createTaggedTrackCollection(std::vector<MaterialBudget*> material
   }
 
   if (!isPixel) {
+      // create root file for hit info
+      std::cout << "create the hit_info root file...";
+      std::string hit_file_name = hit_dir + "/" + "Hit_Info.root";
+      TFile Hit_File(hit_file_name.c_str(),"RECREATE");
+      std::cout << "done" << endl;
+
     // Momentum = Pt
     for (/*const*/ auto& ttcmIt : taggedTrackPtCollectionMap) {
       const string& myTag = ttcmIt.first;
@@ -314,7 +327,7 @@ void Analyzer::createTaggedTrackCollection(std::vector<MaterialBudget*> material
       	const int &parameter = tcmIt.first;
 	      const TrackCollection& myCollection = tcmIt.second;
 	      //std::cout << myCollection.size() << std::endl;
-	      calculateGraphsConstPt(parameter, myCollection, GraphBag::RealGraph, myTag);
+	      calculateGraphsConstPt(parameter, myCollection, GraphBag::RealGraph, myTag, hit_dir);
       }
     }
     for (/*const*/ auto& ttcmIt : taggedTrackPtCollectionMapIdeal) {
@@ -324,7 +337,7 @@ void Analyzer::createTaggedTrackCollection(std::vector<MaterialBudget*> material
       for (const auto& tcmIt : myTrackCollection) {
 	      const int &parameter = tcmIt.first;
 	      const TrackCollection& myCollection = tcmIt.second;
-	      calculateGraphsConstPt(parameter, myCollection, GraphBag::IdealGraph, myTag);
+	      calculateGraphsConstPt(parameter, myCollection, GraphBag::IdealGraph, myTag, hit_dir);
       }
     }
 
@@ -337,7 +350,7 @@ void Analyzer::createTaggedTrackCollection(std::vector<MaterialBudget*> material
 	      const int &parameter = tcmIt.first;
 	      const TrackCollection& myCollection = tcmIt.second;
 	      //std::cout << myCollection.size() << std::endl;
-	      calculateGraphsConstP(parameter, myCollection, GraphBag::RealGraph, myTag);
+	      calculateGraphsConstP(parameter, myCollection, GraphBag::RealGraph, myTag, hit_dir);
       }
     }
     for (/*const*/ auto& ttcmIt : taggedTrackPCollectionMapIdeal) {
@@ -347,9 +360,12 @@ void Analyzer::createTaggedTrackCollection(std::vector<MaterialBudget*> material
       for (const auto& tcmIt : myTrackCollection) {
 	      const int &parameter = tcmIt.first;
 	      const TrackCollection& myCollection = tcmIt.second;
-	      calculateGraphsConstP(parameter, myCollection, GraphBag::IdealGraph, myTag);
+	      calculateGraphsConstP(parameter, myCollection, GraphBag::IdealGraph, myTag, hit_dir);
       }
     }
+    std::cout << "close the hit_info root file...";
+    Hit_File.Close();
+    std::cout << "done" << endl;
   }
   if (debugResolution) calculateParametrizedResolutionPlots(taggedTrackPtCollectionMap);
   }
@@ -1109,8 +1125,14 @@ void Analyzer::analyzeMaterialBudget(MaterialBudget& mb, const std::vector<doubl
     HitPtr hit(new Hit(rPos, zPos, nullptr, HitPassiveType::BeamPipe));
 
     Material material;
-    material.radiation   = 0.0022761 / sin(theta);  // was 0.0023, adapted to fit CMSSW 81X 2016/11/30
-    material.interaction = 0.0020334 / sin(theta);  // was 0.0019, adapted to fit CMSSW 81X 2016/11/30
+    //material.radiation   = 0.0022761 / sin(theta);  // was 0.0023, adapted to fit CMSSW 81X 2016/11/30
+    //material.interaction = 0.0020334 / sin(theta);  // was 0.0019, adapted to fit CMSSW 81X 2016/11/30
+    //material.radiation   = 0.0034462 / sin(theta);  // inner Beryllium: 0.50mm, gap: 0.50mm paraffin, outer Beryllium: 0.35mm
+    //material.interaction = 0.0026133 / sin(theta);  
+    material.radiation   = 0.0014172 / sin(theta);  //CDR beam pipe,  Beryllium: 0.50mm,
+    material.interaction = 0.0011876 / sin(theta);  
+    //material.radiation   = 0.0024094 / sin(theta);  // inner Beryllium: 0.50mm, gap: 0.50mm Helium gas, outer Beryllium: 0.35mm
+    //material.interaction = 0.0020191 / sin(theta);  
     hit->setCorrectedMaterial(material);
     track.addHit(std::move(hit));
 
@@ -1954,7 +1976,8 @@ void Analyzer::clearGraphsP(int graphAttributes, const std::string& graphTag) {
 void Analyzer::calculateGraphsConstPt(const int& parameter,
                                       const TrackCollection& aTrackCollection,
                                       int graphAttributes,
-                                      const string& graphTag) {
+                                      const string& graphTag,
+                                      std::string hit_dir) {
 
   // Get graphs from graphBag
   TGraph& thisRhoGraph_Pt       = graphTag.empty() ? myGraphBag.getGraph(graphAttributes | GraphBag::RhoGraph_Pt     , parameter ) : myGraphBag.getTaggedGraph(graphAttributes | GraphBag::RhoGraph_Pt       , graphTag, parameter);
@@ -2090,7 +2113,8 @@ void Analyzer::calculateGraphsConstPt(const int& parameter,
 void Analyzer::calculateGraphsConstP(const int& parameter,
                                      const TrackCollection& aTrackCollection,
                                      int graphAttributes,
-                                     const string& graphTag) {
+                                     const string& graphTag,
+                                     std::string hit_dir) {
 
   // Get graphs from graphBag
   TGraph& thisRhoGraph_P       = graphTag.empty() ? myGraphBag.getGraph(graphAttributes | GraphBag::RhoGraph_P     , parameter ) : myGraphBag.getTaggedGraph(graphAttributes | GraphBag::RhoGraph_P       , graphTag, parameter);
@@ -2109,6 +2133,25 @@ void Analyzer::calculateGraphsConstP(const int& parameter,
 
   // Prepare plot for const p across costheta
   double momentum = double(parameter)*Units::MeV/Units::GeV;
+
+  //prepare hit information 
+  //
+  //std::cout << "prepare hit_info graph...";
+  TGraph thisHitGraph_P;
+  if (graphAttributes == GraphBag::RealGraph){
+        aName.str(""); aName << "MS_P_numhits_vs_costheta" << momentum << graphTag;
+        thisHitGraph_P.SetTitle("number of hits versus cos#theta - const P across cos#theta;cos#theta;number of hits");
+        thisHitGraph_P.SetName(aName.str().c_str());
+        //std::cout <<  aName.str() << endl;
+        //std::cout << "done" << endl;
+  }
+  if (graphAttributes == GraphBag::IdealGraph){
+        aName.str(""); aName << "noMS_P_numhits_vs_costheta" << momentum << graphTag;
+        thisHitGraph_P.SetTitle("number of hits versus cos#theta - const P across cos#theta;cos#theta;number of hits");
+        thisHitGraph_P.SetName(aName.str().c_str());
+        //std::cout <<  aName.str() << endl;
+        //std::cout << "done" << endl;
+  }
 
   // Prepare plots: p
   thisRhoGraph_P.SetTitle("p_{T} resolution versus cos#theta - const P across cos#theta;cos#theta;#delta p_{T}/p_{T} [%]");
@@ -2160,6 +2203,16 @@ void Analyzer::calculateGraphsConstP(const int& parameter,
 
     double theta = myTrack->getTheta();
     costheta = cos(theta);
+    
+    //------------------------------------//
+    // get the number of hits
+    int num_hits = myTrack->getNActiveHits(graphTag,SimParms::getInstance().useIPConstraint());
+    if (num_hits>0) {
+      thisHitGraph_P.SetPoint(thisHitGraph_P.GetN(), costheta, num_hits );
+    }
+    //-----------------------------------//
+    
+    
     if (dpt>0) {
       // deltaRho / rho = deltaRho * R //
       graphValue = dpt* 100; // in percent
@@ -2200,6 +2253,7 @@ void Analyzer::calculateGraphsConstP(const int& parameter,
     }
 
   }
+  thisHitGraph_P.Write();
 }
 
   /**

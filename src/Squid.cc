@@ -602,13 +602,29 @@ namespace insur {
       }
       if (triggerResolution) {
         startTaskClock("Estimating tracking resolutions");
+        //-------------------------------------------------//
+        // following codes used for hit info
+        
+        string trackerName;
+        if (htmlDir_ != "") trackerName = htmlDir_;
+        else {
+            if (tr) trackerName = baseName_;
+            else trackerName = default_trackername;
+            }
+        string layoutDirectory;
+        layoutDirectory=mainConfiguration.getLayoutDirectory();
+        layoutDirectory+="/"+trackerName;
+        //std::cout << layoutDirectory << endl;
+        //a.hit_info_dir = layoutDirectory; 
+        
+        //------------------------------------------------//
         a.analyzeTaggedTracking(*mb,
                                 mainConfiguration.getMomenta(),
                                 mainConfiguration.getTriggerMomenta(),
                                 mainConfiguration.getThresholdProbabilities(),
 				                        false,
 				                        debugResolution,
-                                tracks, pm);
+                                tracks, pm, layoutDirectory);
         if (pm) {
           pixelAnalyzer.analyzeTaggedTracking(*pm,
                                               mainConfiguration.getMomenta(),
@@ -616,7 +632,7 @@ namespace insur {
 					                                    mainConfiguration.getThresholdProbabilities(),
 					                                    true,
 					                                    debugResolution,
-					                                    tracks, nullptr);
+					                                    tracks, nullptr, layoutDirectory);
         }
         stopTaskClock();
       }
